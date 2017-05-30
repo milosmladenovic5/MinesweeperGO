@@ -6,13 +6,53 @@
     android:layout_height="match_parent"
     tools:context="com.mm.minesweepergo.minesweepergo.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
+    <RelativeLayout
+        android:layout_width="368dp"
+        android:layout_height="495dp"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="8dp">
+
+        <EditText
+            android:id="@+id/liUsername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="71dp"
+            android:ems="10"
+            android:hint="Username"
+            android:inputType="textPersonName" />
+
+        <EditText
+            android:id="@+id/liPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="21dp"
+            android:ems="10"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:layout_below="@+id/liUsername"
+            android:layout_alignStart="@+id/liUsername" />
+
+        <Button
+            android:id="@+id/liLoginBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/liPassword"
+            android:layout_below="@+id/liPassword"
+            android:layout_marginTop="28dp"
+            android:background="@color/colorPrimary"
+            android:text="Login" />
+
+        <Button
+            android:id="@+id/liRegisterBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/liLoginBtn"
+            android:layout_alignBottom="@+id/liLoginBtn"
+            android:layout_alignEnd="@+id/liPassword"
+            android:background="@android:color/holo_red_dark"
+            android:text="Register" />
+    </RelativeLayout>
 </android.support.constraint.ConstraintLayout>
