@@ -5,5 +5,5 @@ package com.mm.minesweepergo.minesweepergo;
  */
 
 public  class Constants {
-    static final String URL = "http://10.0.2.2:8080";
+    static final String URL = "http://192.168.1.104:8000";
 }

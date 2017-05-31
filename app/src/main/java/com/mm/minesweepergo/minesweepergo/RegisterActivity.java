@@ -1,5 +1,5 @@
 package com.mm.minesweepergo.minesweepergo;
-
+import com.mm.minesweepergo.minesweepergo.DomainModel.*;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -13,92 +13,74 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Date;
-import java.util.UUID;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import static android.R.attr.name;
-import static android.R.attr.path;
+import java.io.ByteArrayOutputStream;
+//import java.io.File;
+//import java.io.IOException;
+//import java.net.URI;
+//import java.util.Date;
+//import java.util.UUID;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
-    private Uri imagePath = null;
-    static final int REQUEST_TAKE_PHOTO = 1;
 
-    private String mCurrentPhotoPath;
 
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
+    User user = new User();
+    List<String> usernames = null;
 
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
 
-    private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                // Error occurred while creating the File
+    public void getUsernames()
+    {
+        ExecutorService transThread= Executors.newSingleThreadExecutor();
+        transThread.submit(new Runnable() {
+
+            @Override
+            public void run() {
+
+                try {
+                    usernames = HTTP.getAllUsernames();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
 
             }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this,
-                        "com.example.android.fileprovider",
-                        photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-            }
-        }
-    }
+        });
 
+//        try{
+//            transThread.wait();
+//        }
+//        catch (InterruptedException e){
+//            e.printStackTrace();
+//            this.usernames = null;
+//        }
+    }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+
+        Button registerBtn = (Button) findViewById(R.id.rgRegisterBtn);
+        registerBtn.setOnClickListener(this);
+
+        getUsernames();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case REQUEST_TAKE_PHOTO:
-                try {
-                    if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-                        Bundle extras = data.getExtras();
-                        Bitmap imageBitmap = (Bitmap) extras.get("data");
 
-
-                        this.imagePath = getImageUri(getApplicationContext(), imageBitmap);
-                    }
-                } catch (Exception e) {
-                    Log.e("EditMyPlaceActivity", "Failed fetching location.");
-                }
-                break;
-        }
-    }
 
     public Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -109,43 +91,73 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.rgPictureBtn:
-                Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                getIntent.setType("image/*");
+            break;
 
-                Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                pickIntent.setType("image/*");
-
-                Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
-                chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
-
-                startActivityForResult(chooserIntent, PICK_IMAGE);
 
             case R.id.rgRegisterBtn:
+                if(this.usernames == null)
+                {
+                    Toast.makeText(this, "Connection error!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 EditText usernameET = (EditText)findViewById(R.id.rgUsername);
                 EditText passwordET = (EditText)findViewById(R.id.rgPassword);
                 EditText cpasswordET = (EditText)findViewById(R.id.rgConfirmPassword);
                 EditText emailET = (EditText)findViewById(R.id.rgEmail);
                 EditText phoneET = (EditText)findViewById(R.id.rgPhone);
+                EditText nameET = (EditText)findViewById(R.id.rgFirstName);
+                EditText lnameET = (EditText)findViewById(R.id.rgLastName);
 
                 String username = usernameET.getText().toString();
                 String password = passwordET.getText().toString();
                 String cpassword = cpasswordET.getText().toString();
                 String email = emailET.getText().toString();
                 String phone =  phoneET.getText().toString();
+                String name = nameET.getText().toString();
+                String lname =  lnameET.getText().toString();
 
-                if(username == "" || password == "" || cpassword == "" || email == "" || phone == "" || this.imagePath == null)
+                if(username.equals("") || password.equals("") || cpassword.equals("") || email.equals("") || phone.equals("") || name.equals("") || lname.equals("") )
                 {
                     Toast.makeText(this, "All fields are required!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if(password != cpassword)
+                if(!password.equals(cpassword))
                 {
                     Toast.makeText(this, "Passwords don't match!", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+
+                ExecutorService transThread= Executors.newSingleThreadExecutor();
+
+                user.username = username;
+                user.firstName = name;
+                user.lastName = lname;
+                user.password = password;
+                user.email = email;
+                user.phoneNumber = phone;
+
+                transThread.submit(new Runnable() {
+
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            HTTP.createUser(user);
+
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+
         }
     }
 }

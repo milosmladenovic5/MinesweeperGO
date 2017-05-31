@@ -6,12 +6,22 @@
     android:layout_height="match_parent"
     tools:context="com.mm.minesweepergo.minesweepergo.RegisterActivity">
 
+    <EditText
+        android:id="@+id/rgPhone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Phone number"
+        android:inputType="textPersonName"
+        tools:layout_editor_absoluteX="85dp"
+        tools:layout_editor_absoluteY="370dp" />
+
     <RelativeLayout
         android:layout_width="371dp"
         android:layout_height="508dp"
-        tools:layout_editor_absoluteY="-2dp"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent">
+        android:layout_marginLeft="7dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:layout_editor_absoluteY="1dp">
 
         <EditText
             android:id="@+id/rgUsername"
@@ -28,34 +38,34 @@
             android:id="@+id/rgFirstName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/rgConfirmPassword"
+            android:layout_below="@+id/rgConfirmPassword"
             android:layout_marginTop="13dp"
             android:ems="10"
             android:hint="First name"
-            android:inputType="textPersonName"
-            android:layout_below="@+id/rgConfirmPassword"
-            android:layout_alignStart="@+id/rgConfirmPassword" />
+            android:inputType="textPersonName" />
 
         <EditText
             android:id="@+id/rgLastName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/rgFirstName"
+            android:layout_below="@+id/rgFirstName"
             android:layout_marginTop="14dp"
             android:ems="10"
             android:hint="Last name"
-            android:inputType="textPersonName"
-            android:layout_below="@+id/rgFirstName"
-            android:layout_alignStart="@+id/rgFirstName" />
+            android:inputType="textPersonName" />
 
         <EditText
             android:id="@+id/rgEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/rgLastName"
+            android:layout_below="@+id/rgLastName"
             android:layout_marginTop="14dp"
             android:ems="10"
             android:hint="Email"
-            android:inputType="textPersonName"
-            android:layout_below="@+id/rgLastName"
-            android:layout_alignStart="@+id/rgLastName" />
+            android:inputType="textPersonName" />
 
         <EditText
             android:id="@+id/rgPassword"
@@ -72,11 +82,11 @@
             android:id="@+id/rgPictureBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="@android:color/holo_blue_light"
-            android:text="Picture"
             android:layout_alignParentBottom="true"
             android:layout_alignStart="@+id/rgEmail"
-            android:layout_marginBottom="44dp" />
+            android:layout_marginBottom="44dp"
+            android:backgroundTint="@android:color/holo_blue_light"
+            android:text="Picture" />
 
         <Button
             android:id="@+id/rgRegisterBtn"
@@ -99,14 +109,4 @@
             android:hint="Confirm password"
             android:inputType="textPassword" />
     </RelativeLayout>
-
-    <EditText
-        android:id="@+id/rgPhone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Phone number"
-        android:inputType="textPersonName"
-        tools:layout_editor_absoluteX="85dp"
-        tools:layout_editor_absoluteY="370dp" />
 </android.support.constraint.ConstraintLayout>
