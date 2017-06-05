@@ -80,8 +80,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         getUsernames();
     }
 
-
-
     public Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
@@ -97,11 +95,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
 
             case R.id.rgRegisterBtn:
-                if(this.usernames == null)
-                {
-                    Toast.makeText(this, "Connection error!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
                 EditText usernameET = (EditText)findViewById(R.id.rgUsername);
                 EditText passwordET = (EditText)findViewById(R.id.rgPassword);
                 EditText cpasswordET = (EditText)findViewById(R.id.rgConfirmPassword);
@@ -118,6 +111,17 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 String name = nameET.getText().toString();
                 String lname =  lnameET.getText().toString();
 
+                if(this.usernames == null)
+                {
+                    Toast.makeText(this, "Connection error!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if(this.usernames.contains(username))
+                {
+                    Toast.makeText(this, "Username is already taken!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 if(username.equals("") || password.equals("") || cpassword.equals("") || email.equals("") || phone.equals("") || name.equals("") || lname.equals("") )
                 {
                     Toast.makeText(this, "All fields are required!", Toast.LENGTH_SHORT).show();
@@ -129,7 +133,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     Toast.makeText(this, "Passwords don't match!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
 
                 ExecutorService transThread= Executors.newSingleThreadExecutor();
 
@@ -156,8 +159,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         }
                     }
                 });
-
-
         }
     }
 }

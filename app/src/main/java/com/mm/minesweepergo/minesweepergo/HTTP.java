@@ -30,8 +30,10 @@ public class HTTP {
         String line = "";
         StringBuilder total = new StringBuilder();
         BufferedReader bf = new BufferedReader(new InputStreamReader(is));
-        try {
-            while ((line = bf.readLine()) != null) {
+        try
+        {
+            while ((line = bf.readLine()) != null)
+            {
                 total.append(line);
             }
 
@@ -135,5 +137,10 @@ public class HTTP {
 
         }
         return names;
+    }
+
+    public static User getUser(String username)
+    {
+        return null;
     }
 }

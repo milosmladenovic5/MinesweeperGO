@@ -6,16 +6,6 @@
     android:layout_height="match_parent"
     tools:context="com.mm.minesweepergo.minesweepergo.RegisterActivity">
 
-    <EditText
-        android:id="@+id/rgPhone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Phone number"
-        android:inputType="textPersonName"
-        tools:layout_editor_absoluteX="85dp"
-        tools:layout_editor_absoluteY="370dp" />
-
     <RelativeLayout
         android:layout_width="371dp"
         android:layout_height="508dp"
@@ -108,5 +98,15 @@
             android:ems="10"
             android:hint="Confirm password"
             android:inputType="textPassword" />
+
+        <EditText
+            android:id="@+id/rgPhone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/rgPictureBtn"
+            android:layout_alignEnd="@+id/rgRegisterBtn"
+            android:ems="10"
+            android:hint="Phone number"
+            android:inputType="textPersonName|phone" />
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>
