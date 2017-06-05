@@ -1,6 +1,8 @@
 package com.mm.minesweepergo.minesweepergo;
 
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.renderscript.ScriptGroup;
 import android.util.Log;
 
 import com.mm.minesweepergo.minesweepergo.Constants;
@@ -139,8 +141,63 @@ public class HTTP {
         return names;
     }
 
-    public static User getUser(String username)
+    public static User login(String username, String password)
     {
-        return null;
+        User retUser = null;
+
+        try {
+            URL url = new URL(Constants.URL + "/api/login");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(10000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+
+            JSONObject body = new JSONObject();
+
+            body.put("username", username);
+            body.put("password", password);
+
+            Uri.Builder builder = new Uri.Builder().appendQueryParameter("action", body.toString());
+            String query = builder.build().getEncodedQuery();
+
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            bw.write(query);
+
+            bw.flush();
+            bw.close();
+            os.close();
+            int responseCode = conn.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                String str = inputStreamToString(conn.getInputStream());
+                JSONObject jsonObject = new JSONObject(str);
+
+                if(jsonObject!=null){
+                    retUser = new User();
+                    JSONObject properties = jsonObject.getJSONObject("properties");
+
+                    retUser.username = properties.getString("Username");
+                    retUser.password = properties.getString("Password");
+                    retUser.email   = properties.getString("Email");
+                    retUser.firstName = properties.getString("FirstName");
+                    retUser.lastName = properties.getString("LastName");
+                    retUser.phoneNumber = properties.getString("PhoneNumber");
+                    retUser.imagePath = properties.getString("ImageURL");
+
+
+                }
+            } else
+                Log.e("HTTPCOde_Error", String.valueOf(responseCode));
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+
+        return retUser;
     }
 }

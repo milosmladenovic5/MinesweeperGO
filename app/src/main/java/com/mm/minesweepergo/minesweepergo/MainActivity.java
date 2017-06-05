@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.mm.minesweepergo.minesweepergo.DomainModel.User;
@@ -27,8 +28,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Handler guiThread;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
+        context = this;
+        guiThread = new Handler();
+        pd = new ProgressDialog(MainActivity.this);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -40,28 +44,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onClick(View v)
-    {
-        switch (v.getId())
-        {
+    public void onClick(View v) {
+        switch (v.getId()) {
             case R.id.liRegisterBtn:
-                Intent i = new Intent(this,RegisterActivity.class);
+                Intent i = new Intent(this, RegisterActivity.class);
                 startActivity(i);
                 break;
             case R.id.liLoginBtn:
-                if(!isOnline())
-                {
+                if (!isOnline()) {
                     Toast.makeText(this, "No internet connection!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-
+                getUser();
                 break;
         }
     }
 
-    private  void guiProgressStart()
-    {
+    private void guiProgressStart() {
         guiThread.post(new Runnable() {
             @Override
             public void run() {
@@ -73,25 +73,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    public boolean isOnline()
-    {
+    public boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
-    public void getPlayer()
-    {
+    public void getUser() {
         user = null;
-        ExecutorService transThread= Executors.newSingleThreadExecutor();
+        EditText usernameET = (EditText)findViewById(R.id.liUsername);
+        EditText passwordET = (EditText)findViewById(R.id.liPassword);
+
+        final String username = usernameET.getText().toString();
+        final String password = passwordET.getText().toString();
+
+        if(username.equals("") || password.equals("")){
+            Toast.makeText(this, "Empty username or password field.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ExecutorService transThread = Executors.newSingleThreadExecutor();
         transThread.submit(new Runnable() {
             @Override
             public void run() {
                 try {
                     guiProgressStart();
-                    //player = MyPlacesHTTPHelper.SendUserAndPass(etxUser.getText().toString(), etxPass.getText().toString());
-                    
-                   pd.cancel();
+                    user = HTTP.login(username,password);
+                    pd.cancel();
+
+                    if(user==null){
+                        Toast.makeText(MainActivity.this, "Something went wrong.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    Intent i = new Intent(MainActivity.this, UserPanel.class);
+                    i.putExtra("userInfo",user);
+                  //  byte [] array = Utilities.getByteArrayFromBitmap(user.image);
+                  //  i.putExtra("image", array);
+
+                   // i.putExtra("bitmap", user.image);
+
+                    startActivity(i);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -99,4 +121,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
+    }
 }
