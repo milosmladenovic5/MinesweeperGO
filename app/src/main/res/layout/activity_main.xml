@@ -22,18 +22,20 @@
             android:layout_marginTop="71dp"
             android:ems="10"
             android:hint="Username"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:text="m" />
 
         <EditText
             android:id="@+id/liPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/liUsername"
+            android:layout_below="@+id/liUsername"
             android:layout_marginTop="21dp"
             android:ems="10"
             android:hint="Password"
             android:inputType="textPassword"
-            android:layout_below="@+id/liUsername"
-            android:layout_alignStart="@+id/liUsername" />
+            android:text="m" />
 
         <Button
             android:id="@+id/liLoginBtn"
