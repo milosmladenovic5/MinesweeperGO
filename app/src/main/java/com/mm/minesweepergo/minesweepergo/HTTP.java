@@ -288,4 +288,109 @@ public class HTTP {
         }
         return "false";
     }
+
+    public static List<User> getAllFriends(String username){
+        List<User> users = new ArrayList<User>();
+        try {
+            URL url = new URL(Constants.URL + "/api/getFriends");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(10000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+
+            JSONObject body = new JSONObject();
+
+            body.put("username", username);
+
+            Uri.Builder builder = new Uri.Builder().appendQueryParameter("action", body.toString());
+            String query = builder.build().getEncodedQuery();
+
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            bw.write(query);
+
+            bw.flush();
+            bw.close();
+            os.close();
+            int responseCode = conn.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                String str = inputStreamToString(conn.getInputStream());
+                JSONArray jsonArray = new JSONArray(str);
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObjectOrg = new JSONObject(jsonArray.getString(i));
+
+                    JSONObject jsonObject = jsonObjectOrg.getJSONObject("properties");
+
+                    User user = new User();
+
+                    user.username = jsonObject.getString("Username");
+                    user.password = jsonObject.getString("Password");
+                    user.firstName = jsonObject.getString("FirstName");
+                    user.lastName = jsonObject.getString("LastName");
+                    user.btDevice = jsonObject.getString("BtDevice");
+                    user.email = jsonObject.getString("Email");
+                    user.imagePath = jsonObject.getString("ImageURL");
+                    user.phoneNumber = jsonObject.getString("PhoneNumber");
+
+                    users.add(user);
+
+                }
+            } else
+                Log.e("HTTPCOde_Error", String.valueOf(responseCode));
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        return users;
+    }
+
+    public static boolean startOrEndFriendship(String username, String address, boolean starting)
+    {
+        try {
+            URL url = null;
+            if(starting)
+                url = new URL(Constants.URL + "/api/startFriendship");
+            else
+                url = new URL(Constants.URL + "/api/endFriendship");
+
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(10000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+
+            JSONObject body = new JSONObject();
+
+            body.put("username", username);
+            body.put("address", address);
+
+            Uri.Builder builder = new Uri.Builder().appendQueryParameter("action", body.toString());
+            String query = builder.build().getEncodedQuery();
+
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            bw.write(query);
+
+            bw.flush();
+            bw.close();
+            os.close();
+            int responseCode = conn.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+              return true;
+            } else
+                return false;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

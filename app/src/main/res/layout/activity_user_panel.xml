@@ -56,7 +56,7 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_toLeftOf="@+id/drop_down_option_menu"
-                android:background="@drawable/add_friend"
+
                />
 
             <ImageView
