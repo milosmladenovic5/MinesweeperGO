@@ -1,7 +1,9 @@
 package com.mm.minesweepergo.minesweepergo;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,7 +15,11 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -35,7 +41,7 @@ import java.util.concurrent.Executors;
 import static android.R.attr.thumbnail;
 import static com.mm.minesweepergo.minesweepergo.Utilities.getImageUri;
 
-public class UserPanel extends AppCompatActivity implements View.OnClickListener {
+public class UserPanelActivity extends AppCompatActivity implements View.OnClickListener {
 
     private User user;
 
@@ -45,9 +51,18 @@ public class UserPanel extends AppCompatActivity implements View.OnClickListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_panel);
 
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.userPanelToolbar);
+        setSupportActionBar(myToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+
+
         Intent i = getIntent();
         user = (User) i.getParcelableExtra("userInfo");
         setImage();
+
 
 
         Button uploadBtn = (Button) findViewById(R.id.upUploadBtn);
@@ -102,6 +117,40 @@ public class UserPanel extends AppCompatActivity implements View.OnClickListener
                 Toast.makeText(this, "Bas me briga sto ti ovo ne radi.", Toast.LENGTH_SHORT).show();
                 break;
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        //getMenuInflater().inflate(R.menu.menu_friends, menu);
+//        menu.add(0, 1, 1, "Enable bluetooth");
+//        menu.add
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_user_panel, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.item_logout:
+                Context context = UserPanelActivity.this;
+                SharedPreferences sharedPref = context.getSharedPreferences(
+                        "UserInfo", Context.MODE_PRIVATE);
+
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.clear();
+                editor.commit();
+
+                Intent i = new Intent(this, MainActivity.class);
+                startActivity(i);
+
+                return true;
+            case R.id.item_friends:
+                Intent in = new Intent(this, FriendsActivity.class);
+                startActivity(in);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void setImage() {

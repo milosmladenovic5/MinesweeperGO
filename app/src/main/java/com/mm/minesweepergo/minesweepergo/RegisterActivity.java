@@ -1,6 +1,9 @@
 package com.mm.minesweepergo.minesweepergo;
 import com.mm.minesweepergo.minesweepergo.DomainModel.*;
+
+import android.Manifest;
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -8,6 +11,7 @@ import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -77,6 +81,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         Button registerBtn = (Button) findViewById(R.id.rgRegisterBtn);
         registerBtn.setOnClickListener(this);
 
+        int permCheck = 0;
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.BLUETOOTH},
+                permCheck);
+
         getUsernames();
     }
 
@@ -105,6 +114,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 String phone =  phoneET.getText().toString();
                 String name = nameET.getText().toString();
                 String lname =  lnameET.getText().toString();
+
+                BluetoothAdapter ba = BluetoothAdapter.getDefaultAdapter();
 
                 if(this.usernames == null)
                 {
@@ -137,6 +148,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 user.password = password;
                 user.email = email;
                 user.phoneNumber = phone;
+                user.btDevice = ba.getAddress();
 
                 transThread.submit(new Runnable() {
 

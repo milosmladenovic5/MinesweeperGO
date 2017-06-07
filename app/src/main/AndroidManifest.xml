@@ -7,14 +7,20 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
 
-    <use-feature android:name="android.hardware.camera" android:required="true" />
+    <use-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-
-
 
     <application
         android:allowBackup="true"
@@ -32,7 +38,6 @@
         </activity>
         <activity android:name=".RegisterActivity" />
         android:parentActivityName=".MainActivity" />
-
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.example.android.fileprovider"
@@ -44,9 +49,35 @@
         </provider>
 
         <activity
-            android:name=".UserPanel"
-            />
+            android:name=".UserPanelActivity"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.mm.minesweepergo.minesweepergo.MainActivity" />
+        </activity>
+        <activity
+            android:name=".FriendsActivity"
+            android:parentActivityName=".UserPanelActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.mm.minesweepergo.minesweepergo.UserPanelActivity" />
+        </activity>
 
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCy1idF2drlpa_nUho5HK98G3WKQkQH2Kk" />
+
+        <activity android:name=".UserMapActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.mm.minesweepergo.minesweepergo.UserPanelActivity" />
+            ></activity>
     </application>
 
 </manifest>

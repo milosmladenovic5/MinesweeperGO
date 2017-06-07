@@ -21,6 +21,7 @@ public class User implements Parcelable{
     public String lastName;
     public Bitmap image;
     public String imagePath;
+    public String btDevice = "";
 
 
     public User(){}
@@ -38,6 +39,7 @@ public class User implements Parcelable{
         dest.writeString(this.firstName);
         dest.writeString(this.lastName);
         dest.writeString(this.imagePath);
+        dest.writeString(this.btDevice);
     }
 
     public void readFromParcel(Parcel in){
@@ -48,6 +50,7 @@ public class User implements Parcelable{
         this.firstName = in.readString();
         this.lastName = in.readString();
         this.imagePath = in.readString();
+        this.btDevice = in.readString();
     }
 
     public User(Parcel in)

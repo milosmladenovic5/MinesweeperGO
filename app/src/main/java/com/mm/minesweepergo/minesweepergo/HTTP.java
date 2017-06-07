@@ -72,6 +72,7 @@ public class HTTP {
             body.put("firstname", user.firstName);
             body.put("lastname", user.lastName);
             body.put("phonenumber", user.phoneNumber);
+            body.put("btDevice", user.btDevice);
 
             Uri.Builder builder = new Uri.Builder().appendQueryParameter("action", body.toString());
             String query = builder.build().getEncodedQuery();

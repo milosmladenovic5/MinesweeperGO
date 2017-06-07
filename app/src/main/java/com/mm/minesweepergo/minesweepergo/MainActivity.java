@@ -1,15 +1,16 @@
 package com.mm.minesweepergo.minesweepergo;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +20,8 @@ import com.mm.minesweepergo.minesweepergo.DomainModel.User;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static android.support.v4.content.PermissionChecker.PERMISSION_GRANTED;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -41,7 +44,71 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Button loginBtn = (Button) findViewById(R.id.liLoginBtn);
         loginBtn.setOnClickListener(this);
+
+        int permissionCheck=0;
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                permissionCheck);
+
+        if(permissionCheck== PERMISSION_GRANTED){
+            try
+            {
+                user = readUserPreferences();
+
+                if(!user.username.equals("empty")) {
+                    Intent i = new Intent(MainActivity.this, UserPanelActivity.class);
+                    i.putExtra("userInfo", user);
+                    //  byte [] array = Utilities.getByteArrayFromBitmap(user.image);
+                    //  i.putExtra("image", array);
+
+                    // i.putExtra("bitmap", user.image);
+
+                    startActivity(i);
+                }
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        user = readUserPreferences();
+
+        if(!user.username.equals("empty")) {
+            Intent i = new Intent(MainActivity.this, UserPanelActivity.class);
+            i.putExtra("userInfo", user);
+            //  byte [] array = Utilities.getByteArrayFromBitmap(user.image);
+            //  i.putExtra("image", array);
+
+            // i.putExtra("bitmap", user.image);
+
+            startActivity(i);
+        }
+    }
+
+    public User readUserPreferences()
+    {
+        User retUser = new User();
+
+        Context context = MainActivity.this;
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                "UserInfo", Context.MODE_PRIVATE);
+
+        retUser.username = sharedPref.getString("Username", "empty");
+        retUser.password = sharedPref.getString("Password", "empty");
+        retUser.email = sharedPref.getString("Email","empty");
+        retUser.lastName = sharedPref.getString("LastName", "empty");
+        retUser.firstName = sharedPref.getString("FirstName", "empty");
+        retUser.imagePath = sharedPref.getString("ImagePath", "empty");
+        retUser.btDevice = sharedPref.getString("BtDevice", "empty");
+
+        return  retUser;
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -106,7 +173,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         return;
                     }
 
-                    Intent i = new Intent(MainActivity.this, UserPanel.class);
+                    Context context = MainActivity.this;
+                    SharedPreferences sharedPref = context.getSharedPreferences(
+                            "UserInfo", Context.MODE_PRIVATE);
+
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putString("Username", user.username);
+                    editor.putString("Password", user.password);
+                    editor.putString("FirstName", user.firstName);
+                    editor.putString("LastName", user.lastName);
+                    editor.putString("Email", user.email);
+                    editor.putString("PhoneNumber", user.phoneNumber);
+                    editor.putString("ImagePath", user.imagePath);
+                    editor.putString("BtDevice", user.btDevice);
+                    editor.commit();
+
+                    Intent i = new Intent(MainActivity.this, UserPanelActivity.class);
                     i.putExtra("userInfo",user);
                   //  byte [] array = Utilities.getByteArrayFromBitmap(user.image);
                   //  i.putExtra("image", array);
