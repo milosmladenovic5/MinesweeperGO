@@ -22,6 +22,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static android.support.v4.content.PermissionChecker.PERMISSION_GRANTED;
+import static com.mm.minesweepergo.minesweepergo.Utilities.readUserPreferences;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -90,24 +91,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public User readUserPreferences()
-    {
-        User retUser = new User();
 
-        Context context = MainActivity.this;
-        SharedPreferences sharedPref = context.getSharedPreferences(
-                "UserInfo", Context.MODE_PRIVATE);
-
-        retUser.username = sharedPref.getString("Username", "empty");
-        retUser.password = sharedPref.getString("Password", "empty");
-        retUser.email = sharedPref.getString("Email","empty");
-        retUser.lastName = sharedPref.getString("LastName", "empty");
-        retUser.firstName = sharedPref.getString("FirstName", "empty");
-        retUser.imagePath = sharedPref.getString("ImagePath", "empty");
-        retUser.btDevice = sharedPref.getString("BtDevice", "empty");
-
-        return  retUser;
-    }
 
 
     @Override

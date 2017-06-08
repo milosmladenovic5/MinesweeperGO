@@ -86,6 +86,19 @@
                 android:value="com.mm.minesweepergo.minesweepergo.UserPanelActivity" />
         </activity>
 
+        <service
+            android:name=".MinesweeperService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <receiver
+            android:name=".ServiceReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.mm.minesweepergo.minesweepergo.NOTIFICATION"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -22,6 +22,8 @@ public class User implements Parcelable{
     public Bitmap image;
     public String imagePath;
     public String btDevice = "";
+    public double longitude;
+    public double latitude;
 
 
     public User(){}

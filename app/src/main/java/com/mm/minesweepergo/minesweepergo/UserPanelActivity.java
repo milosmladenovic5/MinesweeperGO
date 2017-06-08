@@ -1,6 +1,9 @@
 package com.mm.minesweepergo.minesweepergo;
 
 import android.Manifest;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,10 +14,10 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.TaskStackBuilder;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -32,9 +35,7 @@ import com.mm.minesweepergo.minesweepergo.DomainModel.User;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -85,7 +86,17 @@ public class UserPanelActivity extends AppCompatActivity implements View.OnClick
 
         ImageButton addFriend = (ImageButton) findViewById(R.id.add_friend);
         addFriend.setOnClickListener(this);
+
+        int permissionCheck = 0;
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
+                permissionCheck);
+
+        startService(new Intent(UserPanelActivity.this, MinesweeperService.class));
+
     }
+
+
 
     @Override
     public void onClick(View view) {
@@ -95,19 +106,12 @@ public class UserPanelActivity extends AppCompatActivity implements View.OnClick
                 int permissionCheck = 0;
 
                 ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.CAMERA},
+                        new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE,MediaStore.ACTION_IMAGE_CAPTURE},
                         permissionCheck);
 
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        permissionCheck);
-
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        permissionCheck);
 
                 if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-                    Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    Intent i = new Intent();
                     startActivityForResult(i, 0);
                 }
 
@@ -118,6 +122,7 @@ public class UserPanelActivity extends AppCompatActivity implements View.OnClick
                 break;
         }
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -140,6 +145,7 @@ public class UserPanelActivity extends AppCompatActivity implements View.OnClick
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.clear();
                 editor.commit();
+                stopService(new Intent(UserPanelActivity.this, MinesweeperService.class) );
 
                 Intent i = new Intent(this, MainActivity.class);
                 startActivity(i);
