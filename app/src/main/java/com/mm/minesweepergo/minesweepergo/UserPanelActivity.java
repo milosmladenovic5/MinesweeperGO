@@ -149,6 +149,10 @@ public class UserPanelActivity extends AppCompatActivity implements View.OnClick
                 Intent in = new Intent(this, FriendsActivity.class);
                 startActivity(in);
                 break;
+            case R.id.item_users_map:
+                Intent inte  = new Intent(this, UsersMapActivity.class);
+                startActivity(inte);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

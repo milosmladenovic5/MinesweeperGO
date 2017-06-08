@@ -7,5 +7,7 @@
         android:orderInCategory="100" app:showAsAction="ifRoom" />
     <item android:id="@+id/item_friends" android:title="Friends"
         android:orderInCategory="100" app:showAsAction="collapseActionView" />
+    <item android:id="@+id/item_users_map" android:title="Map"
+        android:orderInCategory="100" app:showAsAction="collapseActionView" />
 
 </menu>

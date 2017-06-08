@@ -14,7 +14,6 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
-
     <use-feature
         android:name="android.hardware.camera"
         android:required="true" />
@@ -65,19 +64,28 @@
                 android:value="com.mm.minesweepergo.minesweepergo.UserPanelActivity" />
         </activity>
 
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/" />
+        <!--
+             The API key for Google Maps-based APIs is defined as a string resource.
+             (See the file "res/values/google_maps_api.xml").
+             Note that the API key is linked to the encryption key used to sign the APK.
+             You need a different API key for each encryption key, including the release key that is used to
+             sign the APK for publishing.
+             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
+        -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCy1idF2drlpa_nUho5HK98G3WKQkQH2Kk" />
+            android:value="@string/google_maps_key" />
 
-        <activity android:name=".UserMapActivity"
+        <activity
+            android:name=".UsersMapActivity"
+            android:label="@string/title_activity_users_map"
+            android:parentActivityName=".UserPanelActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.mm.minesweepergo.minesweepergo.UserPanelActivity" />
-            ></activity>
+        </activity>
+
     </application>
 
 </manifest>
