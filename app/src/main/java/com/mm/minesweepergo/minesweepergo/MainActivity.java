@@ -73,6 +73,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+
+
+    @Override
+    public void onBackPressed() {
+        finish();
+        Intent a = new Intent(Intent.ACTION_MAIN);
+        a.addCategory(Intent.CATEGORY_HOME);
+        a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(a);
+
+        super.onBackPressed();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -91,7 +104,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Context context = MainActivity.this;
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                "UserInfo", Context.MODE_PRIVATE);
 
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.clear();
+        editor.commit();
+        stopService(new Intent(MainActivity.this, MinesweeperService.class) );
+    }
+
+    public  User readUserPreferences()
+    {
+        User retUser = new User();
+
+        SharedPreferences sharedPref = this.getSharedPreferences(
+                "UserInfo", Context.MODE_PRIVATE);
+
+        retUser.username = sharedPref.getString("Username", "empty");
+        retUser.password = sharedPref.getString("Password", "empty");
+        retUser.email = sharedPref.getString("Email","empty");
+        retUser.lastName = sharedPref.getString("LastName", "empty");
+        retUser.firstName = sharedPref.getString("FirstName", "empty");
+        retUser.imagePath = sharedPref.getString("ImagePath", "empty");
+        retUser.btDevice = sharedPref.getString("BtDevice", "empty");
+
+        return  retUser;
+    }
 
 
     @Override

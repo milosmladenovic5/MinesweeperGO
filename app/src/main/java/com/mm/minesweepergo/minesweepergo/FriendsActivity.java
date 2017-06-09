@@ -33,6 +33,7 @@ import com.mm.minesweepergo.minesweepergo.DomainModel.User;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -55,6 +56,7 @@ public class FriendsActivity extends AppCompatActivity {
     int index = -1;
     private String userName;
     private Handler guiThread;
+    List<User> friends;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,8 +105,7 @@ public class FriendsActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    //MyPlacesHTTPHelper.FriendsRegistration(userName, address);
-
+                    HTTP.startOrEndFriendship(userName,address,true);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -116,6 +117,7 @@ public class FriendsActivity extends AppCompatActivity {
 
     private void EndFriendship(final String bdDevice) {
         ExecutorService transThread = Executors.newSingleThreadExecutor();
+
         transThread.submit(new Runnable() {
             @Override
             public void run() {
@@ -124,6 +126,7 @@ public class FriendsActivity extends AppCompatActivity {
                     for (User u : users)
                         if (u.btDevice.equals(bdDevice))
                             users.remove(u);
+                    HTTP.startOrEndFriendship(userName,"",false);
 
                     guiNotifyUser(users);
                 } catch (Exception e) {
@@ -260,6 +263,11 @@ public class FriendsActivity extends AppCompatActivity {
 
             this.SearchNewDevices();
 
+        }
+        if(id==android.R.id.home){
+        // todo: goto back activity from here
+        finish();
+        return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -407,7 +415,7 @@ public class FriendsActivity extends AppCompatActivity {
                 public void run() {
                     try {
 
-                        //players = MyPlacesHTTPHelper.getFriends(userName);
+                        friends = HTTP.getAllFriends(userName);
                         guiNotifyUser(users);
 
                     } catch (Exception e) {

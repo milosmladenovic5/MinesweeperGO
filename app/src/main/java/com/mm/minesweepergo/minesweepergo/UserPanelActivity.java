@@ -1,25 +1,21 @@
 package com.mm.minesweepergo.minesweepergo;
 
 import android.Manifest;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
+import android.location.Location;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -30,6 +26,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.mm.minesweepergo.minesweepergo.DomainModel.User;
 
 import java.io.ByteArrayOutputStream;
@@ -39,13 +38,12 @@ import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static android.R.attr.thumbnail;
-import static com.mm.minesweepergo.minesweepergo.Utilities.getImageUri;
-
 public class UserPanelActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private User user;
-
+    private User visitingUser;
+    private User homeUser;
+    boolean visitingCall;
+    int REQUEST_IMAGE_CAPTION = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,48 +52,69 @@ public class UserPanelActivity extends AppCompatActivity implements View.OnClick
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.userPanelToolbar);
         setSupportActionBar(myToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-
-
         Intent i = getIntent();
-        user = (User) i.getParcelableExtra("userInfo");
+        visitingUser = (User) i.getParcelableExtra("userInfo");
         setImage();
-
-
-
-        Button uploadBtn = (Button) findViewById(R.id.upUploadBtn);
-        uploadBtn.setOnClickListener(this);
+        homeUser = readUserPreferences();
 
         TextView usernamelbl = (TextView) findViewById(R.id.upUsernameLbl);
-        usernamelbl.setText(user.username);
+        usernamelbl.setText(visitingUser.username);
 
         TextView emailLbl = (TextView) findViewById(R.id.upEmailLbl);
-        emailLbl.setText(user.email);
+        emailLbl.setText(visitingUser.email);
 
         TextView firstNameLbl = (TextView) findViewById(R.id.upFirstNamelbl);
-        firstNameLbl.setText(user.firstName);
+        firstNameLbl.setText("First name:\t\t\t\t" + visitingUser.firstName);
 
         TextView lastNameLbl = (TextView) findViewById(R.id.upLastNameLbl);
-        lastNameLbl.setText(user.lastName);
+        lastNameLbl.setText("Last name: \t\t\t\t" + visitingUser.lastName);
 
         TextView phoneNumberLbl = (TextView) findViewById(R.id.upPhoneNumberLbl);
-        phoneNumberLbl.setText(user.phoneNumber);
-
-        ImageButton addFriend = (ImageButton) findViewById(R.id.add_friend);
-        addFriend.setOnClickListener(this);
+        phoneNumberLbl.setText("Phone number: \t\t\t\t" + visitingUser.phoneNumber);
 
         int permissionCheck = 0;
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
                 permissionCheck);
 
-        startService(new Intent(UserPanelActivity.this, MinesweeperService.class));
+        Button uploadBtn = (Button) findViewById(R.id.upUploadBtn);
 
+        if(homeUser.username.equals(visitingUser.username)){
+            Intent in = new Intent(UserPanelActivity.this, MinesweeperService.class);
+            in.putExtra("Username", homeUser.username);
+            startService(in);
+
+            uploadBtn.setOnClickListener(this);
+        }
+        else{
+            uploadBtn.setVisibility(View.GONE);
+            visitingCall = true;
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        }
     }
 
+
+    public User readUserPreferences()
+    {
+        User retUser = new User();
+
+        SharedPreferences sharedPref = this.getSharedPreferences(
+                "UserInfo", Context.MODE_PRIVATE);
+
+        retUser.username = sharedPref.getString("Username", "empty");
+        retUser.password = sharedPref.getString("Password", "empty");
+        retUser.email = sharedPref.getString("Email","empty");
+        retUser.lastName = sharedPref.getString("LastName", "empty");
+        retUser.firstName = sharedPref.getString("FirstName", "empty");
+        retUser.imagePath = sharedPref.getString("ImagePath", "empty");
+        retUser.btDevice = sharedPref.getString("BtDevice", "empty");
+
+        return  retUser;
+    }
 
 
     @Override
@@ -111,27 +130,34 @@ public class UserPanelActivity extends AppCompatActivity implements View.OnClick
 
 
                 if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-                    Intent i = new Intent();
-                    startActivityForResult(i, 0);
+                    Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    try {
+                        startActivityForResult(i, REQUEST_IMAGE_CAPTION);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
 
                 break;
-            case R.id.add_friend:
 
-                Toast.makeText(this, "Bas me briga sto ti ovo ne radi.", Toast.LENGTH_SHORT).show();
-                break;
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        if(this.visitingCall==true)
+            finishActivity(1);
+
+        super. onBackPressed();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        //getMenuInflater().inflate(R.menu.menu_friends, menu);
-//        menu.add(0, 1, 1, "Enable bluetooth");
-//        menu.add
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_user_panel, menu);
+        if(this.visitingUser.username.equals(homeUser.username)){
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.menu_user_panel, menu);
+        }
         return true;
     }
     @Override
@@ -157,8 +183,16 @@ public class UserPanelActivity extends AppCompatActivity implements View.OnClick
                 break;
             case R.id.item_users_map:
                 Intent inte  = new Intent(this, UsersMapActivity.class);
+                inte.putExtra("Username",this.visitingUser.username);
                 startActivity(inte);
                 break;
+            case android.R.id.home:
+                // todo: goto back activity from here
+
+                if(this.visitingCall==true)
+                    finishActivity(1);
+                finish();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -169,7 +203,7 @@ public class UserPanelActivity extends AppCompatActivity implements View.OnClick
             @Override
             public void run() {
                 try {
-                    InputStream input = new java.net.URL(Constants.URL + user.imagePath).openStream();
+                    InputStream input = new java.net.URL(Constants.URL + visitingUser.imagePath).openStream();
                     ImageView iv = (ImageView) findViewById(R.id.upProfileImageView);
                     iv.setImageBitmap(BitmapFactory.decodeStream(input));
 
@@ -183,36 +217,39 @@ public class UserPanelActivity extends AppCompatActivity implements View.OnClick
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+        if (requestCode == REQUEST_IMAGE_CAPTION)
+        {
+            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
 
-        ImageView iv = (ImageView) findViewById(R.id.upProfileImageView);
-        //iv.setImageBitmap(bitmap);
+            ImageView iv = (ImageView) findViewById(R.id.upProfileImageView);
+            iv.setImageBitmap(bitmap);
 
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-        final File destination = new File(Environment.getExternalStorageDirectory(), "temp.jpg");
-        FileOutputStream fo;
-        try {
-            fo = new FileOutputStream(destination);
-            fo.write(bytes.toByteArray());
-            fo.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-
-
-        }
-        ExecutorService transThread = Executors.newSingleThreadExecutor();
-        transThread.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    HTTP.uploadPicture(user.username, destination.getAbsolutePath());
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+            final File destination = new File(Environment.getExternalStorageDirectory(), "temp.jpg");
+            FileOutputStream fo;
+            try {
+                fo = new FileOutputStream(destination);
+                fo.write(bytes.toByteArray());
+                fo.close();
+            } catch (Exception e) {
+                e.printStackTrace();
 
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
             }
-        });
+            ExecutorService transThread = Executors.newSingleThreadExecutor();
+            transThread.submit(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        HTTP.uploadPicture(visitingUser.username, destination.getAbsolutePath());
+
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
     }
 }

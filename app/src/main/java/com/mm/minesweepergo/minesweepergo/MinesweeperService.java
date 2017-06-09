@@ -12,9 +12,12 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.IntDef;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
+
+import com.mm.minesweepergo.minesweepergo.DomainModel.User;
 
 import java.net.Inet4Address;
 import java.util.List;
@@ -27,6 +30,13 @@ public class MinesweeperService extends Service {
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 5f;
 
+    private String username = "";
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        username = (String) intent.getExtras().get("Username");
+        return super.onStartCommand(intent, flags, startId);
+    }
 
     private class LocationListener implements android.location.LocationListener
     {
@@ -39,6 +49,7 @@ public class MinesweeperService extends Service {
             mLastLocation = new Location(provider);
         }
 
+
         @Override
         public void onLocationChanged(Location location)
         {
@@ -50,7 +61,7 @@ public class MinesweeperService extends Service {
                 @Override
                 public void run() {
                     try {
-                        List<String> retData = HTTP.sendLocationInfo("qrc",currLocation);
+                        List<String> retData = HTTP.sendLocationInfo(username,currLocation);
                         callBroadcastReceiver(retData);
 
                     } catch (Exception e) {

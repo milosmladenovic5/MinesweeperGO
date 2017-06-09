@@ -21,7 +21,9 @@ import java.io.ByteArrayOutputStream;
  * Created by Milos on 6/5/2017.
  */
 
-public class Utilities extends Application
+
+
+public class Utilities
 {
     public static byte[] getByteArrayFromBitmap(Bitmap bmp){
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -37,16 +39,6 @@ public class Utilities extends Application
         return sApplication;
     }
 
-    public static Context getContext() {
-        return getApplication().getApplicationContext();
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        sApplication = this;
-    }
-
     public static Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
@@ -58,16 +50,7 @@ public class Utilities extends Application
     {
         User retUser = new User();
 
-        SharedPreferences sharedPref = getContext().getSharedPreferences(
-                "UserInfo", Context.MODE_PRIVATE);
 
-        retUser.username = sharedPref.getString("Username", "empty");
-        retUser.password = sharedPref.getString("Password", "empty");
-        retUser.email = sharedPref.getString("Email","empty");
-        retUser.lastName = sharedPref.getString("LastName", "empty");
-        retUser.firstName = sharedPref.getString("FirstName", "empty");
-        retUser.imagePath = sharedPref.getString("ImagePath", "empty");
-        retUser.btDevice = sharedPref.getString("BtDevice", "empty");
 
         return  retUser;
     }

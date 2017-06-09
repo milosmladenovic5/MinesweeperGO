@@ -9,11 +9,11 @@
         android:orderInCategory="100"
         app:showAsAction="ifRoom" />
 
-    <item
+<!--    <item
         android:id="@+id/get_friends"
         android:title="Get friends"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        app:showAsAction="never" />-->
 
     <item
         android:id="@+id/select_loc_item"

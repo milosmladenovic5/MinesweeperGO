@@ -31,7 +31,7 @@ public class ServiceReceiver extends BroadcastReceiver {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
+                        .setSmallIcon(R.drawable.icon_minesweeper)
                         .setContentTitle("Friends nearby")
                         .setContentText("There are " + friendsCount + " friends nearby. Tap to see them on map.");
 
