@@ -16,8 +16,8 @@
         app:showAsAction="never" />-->
 
     <item
-        android:id="@+id/select_loc_item"
-        android:title="Select location"
+        android:id="@+id/show_online_users_item"
+        android:title="Show online users"
         android:orderInCategory="100"
         app:showAsAction="never" />
     <item
@@ -25,4 +25,17 @@
         android:title="Close map"
         android:orderInCategory="100"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/search_arenas_by_distance"
+        android:title="Radius search"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/search_arenas_by_name"
+        android:title="Name search"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
 </menu>

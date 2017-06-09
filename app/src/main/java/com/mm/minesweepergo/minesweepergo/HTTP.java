@@ -5,8 +5,10 @@ import android.location.Location;
 import android.net.Uri;
 import android.renderscript.ScriptGroup;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.mm.minesweepergo.minesweepergo.Constants;
+import com.mm.minesweepergo.minesweepergo.DomainModel.Arena;
 import com.mm.minesweepergo.minesweepergo.DomainModel.User;
 
 import org.json.JSONArray;
@@ -146,6 +148,67 @@ public class HTTP {
         return names;
     }
 
+
+
+
+    public static List<User> getOnlineUsers() {
+        List<User> users = new ArrayList<User>();
+        String retStr = null;
+        try {
+            URL url = new URL(Constants.URL + "/api/getOnlineUsers");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(10000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+
+
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            //bw.write(query);
+
+            bw.flush();
+            bw.close();
+            os.close();
+            int responseCode = conn.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                String str = inputStreamToString(conn.getInputStream());
+                JSONArray jsonArray = new JSONArray(str);
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObjectOrg = new JSONObject(jsonArray.getString(i));
+
+                    JSONObject jsonObject = jsonObjectOrg.getJSONObject("properties");
+
+                    User user = new User();
+
+                    user.username = jsonObject.getString("Username");
+                    user.password = jsonObject.getString("Password");
+                    user.firstName = jsonObject.getString("FirstName");
+                    user.lastName = jsonObject.getString("LastName");
+                    user.btDevice = jsonObject.getString("BtDevice");
+                    user.email = jsonObject.getString("Email");
+                    user.imagePath = jsonObject.getString("ImageURL");
+                    user.phoneNumber = jsonObject.getString("PhoneNumber");
+                    user.latitude = jsonObject.getDouble("Latitude");
+                    user.longitude = jsonObject.getDouble("Longitude");
+
+                    users.add(user);
+
+                }
+            } else
+                Log.e("HTTPCOde_Error", String.valueOf(responseCode));
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        return users;
+    }
+
     public static User login(String username, String password)
     {
         User retUser = null;
@@ -204,6 +267,42 @@ public class HTTP {
         }
 
         return retUser;
+    }
+
+    public static void logout(String username){
+
+        try {
+            URL url = new URL(Constants.URL + "/api/logout");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(10000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+
+            JSONObject body = new JSONObject();
+
+            body.put("username", username);
+
+            Uri.Builder builder = new Uri.Builder().appendQueryParameter("action", body.toString());
+            String query = builder.build().getEncodedQuery();
+
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            bw.write(query);
+
+            bw.flush();
+            bw.close();
+            os.close();
+            int responseCode = conn.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+
+            } else
+                Log.e("HTTPCOde_Error", String.valueOf(responseCode));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static String uploadPicture(String username, String path) {
@@ -402,6 +501,7 @@ public class HTTP {
         try {
             URL url = new URL(Constants.URL + "/api/locationMonitor");
 
+
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setConnectTimeout(15000);
             conn.setReadTimeout(10000);
@@ -434,11 +534,9 @@ public class HTTP {
                 List<String> usernamesDistance = new ArrayList<>();
 
                 for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject jsonObjectOrg = new JSONObject(jsonArray.getString(i));
+                    JSONObject jsonObject = new JSONObject(jsonArray.getString(i));
 
-                    JSONObject jsonObject = jsonObjectOrg.getJSONObject("properties");
-
-                    usernamesDistance.add(jsonObject.getString("Username") + " | " + jsonObject.getString("Distance"));
+                    usernamesDistance.add(jsonObject.getString("Username") + " | " + jsonObject.getDouble("Distance"));
                 }
                 return usernamesDistance;
 
@@ -509,5 +607,118 @@ public class HTTP {
 
         return retUser;
     }
+
+    public static Arena getArena(String name)
+    {
+        Arena retArena = null;
+
+        try {
+            URL url = new URL(Constants.URL + "/api/getArena");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(10000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+
+            JSONObject body = new JSONObject();
+
+            body.put("name", name);
+
+
+            Uri.Builder builder = new Uri.Builder().appendQueryParameter("action", body.toString());
+            String query = builder.build().getEncodedQuery();
+
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            bw.write(query);
+
+            bw.flush();
+            bw.close();
+            os.close();
+            int responseCode = conn.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                String str = inputStreamToString(conn.getInputStream());
+                JSONObject properties = new JSONObject(str);
+
+                if(properties!=null){
+                    retArena = new Arena();
+
+                    retArena.name = properties.getString("Name");
+                    retArena.radius = properties.getDouble("Radius");
+                    retArena.centerLat = properties.getDouble("CenterLatitude");
+                    retArena.centerLon = properties.getDouble("CenterLongitude");
+                }
+            } else
+                Log.e("HTTPCOde_Error", String.valueOf(responseCode));
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+
+        return retArena;
+    }
+
+    public static List<Arena> getArenasByDistance(double latitude, double longitude, double radius) {
+        List<Arena> arenas = new ArrayList<Arena>();
+
+        try {
+            URL url = new URL(Constants.URL + "/api/getArenasByDistance");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(10000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+
+            JSONObject body = new JSONObject();
+
+            body.put("latitude", latitude);
+            body.put("longitude", longitude);
+            body.put("radius", radius);
+
+            Uri.Builder builder = new Uri.Builder().appendQueryParameter("action", body.toString());
+            String query = builder.build().getEncodedQuery();
+
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            bw.write(query);
+
+            bw.flush();
+            bw.close();
+            os.close();
+            int responseCode = conn.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                String str = inputStreamToString(conn.getInputStream());
+                JSONArray jsonArray = new JSONArray(str);
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObjectOrg = new JSONObject(jsonArray.getString(i));
+
+                    Arena ar = new Arena();
+
+                    ar.name = jsonObjectOrg.getString("Name");
+                    ar.radius = jsonObjectOrg.getDouble("Radius");
+                    ar.centerLat = jsonObjectOrg.getDouble("CenterLatitude");
+                    ar.centerLon = jsonObjectOrg.getDouble("CenterLongitude");
+
+                    arenas.add(ar);
+                }
+            } else
+                Log.e("HTTPCOde_Error", String.valueOf(responseCode));
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        return arenas;
+    }
+
+
 
 }

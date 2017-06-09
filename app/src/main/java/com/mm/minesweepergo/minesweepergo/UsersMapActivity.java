@@ -1,20 +1,17 @@
 package com.mm.minesweepergo.minesweepergo;
 
 import android.Manifest;
+import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
-import android.icu.util.MeasureUnit;
-import android.icu.util.TimeUnit;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Handler;
@@ -25,12 +22,10 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.app.Activity;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -51,6 +46,7 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.mm.minesweepergo.minesweepergo.DomainModel.Arena;
 import com.mm.minesweepergo.minesweepergo.DomainModel.User;
 
 import java.io.InputStream;
@@ -61,7 +57,7 @@ import java.util.concurrent.Executors;
 
 import static com.mm.minesweepergo.minesweepergo.R.id.map;
 
-public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCallback,GoogleMap.OnMarkerClickListener, GoogleApiClient.OnConnectionFailedListener,LocationListener,GoogleApiClient.ConnectionCallbacks {
+public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCallback,GoogleMap.OnMarkerClickListener, GoogleApiClient.OnConnectionFailedListener,LocationListener,GoogleApiClient.ConnectionCallbacks, InputDialogFragment.NoticeDialogListener {
 
     public static final int SHOW_MAP = 0;
     public static final int CENTER_PLACE_ON_MAP = 1;
@@ -70,13 +66,9 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
     private static final float LOCATION_DISTANCE = 5f;
 
     private int state = 0;
-    private boolean selCoordsEnabled = false;
-    private LatLng placeLoc;
     private GoogleMap mMap;
-    private HashMap<Marker, Integer> markerPlaceIdMap;
     private SupportMapFragment mapFragment;
-    private LocationManager  mLocationManager;
-    private List<User> friends;
+    private List<User> users;
     private String username;
     private Context context;
     private Handler guiThread;
@@ -87,8 +79,9 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
     LocationRequest mLocationRequest;
     Marker mCurrLocationMarker;
     private Circle mCircle;
-
-
+    private List<User> onlineUsers;
+    public String dialogRetVal;
+    private boolean radius;
 
 
     double radiusInMeters = 100.0;
@@ -98,14 +91,11 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        context= this;
+        context = this;
         this.guiThread = new Handler();
         pd = new ProgressDialog(UsersMapActivity.this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_users_map);
-
-
-
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -119,9 +109,63 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         Intent i = getIntent();
-        this.username =i.getExtras().getString("Username","empty");
+        this.username = i.getExtras().getString("Username", "empty");
     }
 
+    public void showNoticeDialog() {
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new InputDialogFragment();
+        dialog.show(getFragmentManager(),"Notice");
+    }
+
+    @Override
+    public void onDialogPositiveClick(android.app.DialogFragment dialog) {
+        if(radius) {
+            //ovde je imeplementirano trazenje po  radiusu
+            Toast.makeText(this, InputDialogFragment.name , Toast.LENGTH_LONG).show();
+            this.dialogRetVal= InputDialogFragment.name;
+            ExecutorService transThread = Executors.newSingleThreadExecutor();
+            transThread.submit(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+
+                        List<Arena> arenas = HTTP.getArenasByDistance(mLastLocation.getLatitude(),mLastLocation.getLongitude(), Double.parseDouble(dialogRetVal));
+
+                        Toast.makeText(UsersMapActivity.this, arenas.get(0).name, Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        //pd.cancel();
+                    }
+                }
+            });
+        }
+        else{
+            //trazenje po imenu arene je ovde implementirano
+            Toast.makeText(this, InputDialogFragment.name , Toast.LENGTH_LONG).show();
+            this.dialogRetVal= InputDialogFragment.name;
+            ExecutorService transThread = Executors.newSingleThreadExecutor();
+            transThread.submit(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+
+                        Arena arena = HTTP.getArena(dialogRetVal);
+                        Toast.makeText(UsersMapActivity.this, arena.name, Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        //pd.cancel();
+                    }
+                }
+            });
+        }
+
+    }
+
+    @Override
+    public void onDialogNegativeClick(android.app.DialogFragment dialog) {
+
+    }
 
     @Override
     public void onPause() {
@@ -132,11 +176,12 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
     }
+
     public boolean onMarkerClick(final Marker marker) {
-        // Retrieve the data from the marker.
 /*
         Integer clickCount = (Integer) marker.getTag();
-*/      final String title = marker.getTitle();
+*/
+        final String title = marker.getTitle();
 
         ExecutorService transThread = Executors.newSingleThreadExecutor();
         transThread.submit(new Runnable() {
@@ -145,28 +190,18 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                 try {
                     //guiProgressStart("Fetching user.");
                     User user = HTTP.getUser(title);
-                   // pd.cancel();
+                    // pd.cancel();
                     Intent i = new Intent(UsersMapActivity.this, UserPanelActivity.class);
                     i.putExtra("userInfo", user);
                     int req = 0;
-                    startActivityForResult(i,req);
+                    startActivityForResult(i, req);
                 } catch (Exception e) {
                     e.printStackTrace();
                     //pd.cancel();
                 }
 
             }
-        });/*
-        if (clickCount != null) {
-            clickCount = clickCount + 1;
-            marker.setTag(clickCount);
-//            Toast.makeText(this,
-//                    marker.getTitle() +
-//                            " has been clicked " + clickCount + " times.",
-//                    Toast.LENGTH_SHORT).show();
-
-
-        }*/
+        });
         return false;
     }
 
@@ -197,38 +232,32 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
         });
     }
 
-
-
-    public Bitmap createIcon(Bitmap b, String username)
-    {
+    public Bitmap createIcon(Bitmap b, String username) {
         Bitmap.Config conf = Bitmap.Config.ARGB_8888;
         Bitmap bmp = Bitmap.createBitmap(80, 80, conf);
         Canvas canvas1 = new Canvas(bmp);
 
-// paint defines the text color, stroke width and size
         Paint color = new Paint();
         color.setTextSize(35);
         color.setColor(Color.BLACK);
 
-// modify canvas
-        canvas1.drawBitmap(b, 0,0, color);
+        canvas1.drawBitmap(b, 0, 0, color);
 
         canvas1.drawText("User Name!", 30, 40, color);
 
         return bmp;
     }
-    public void loadFriends()
-    {
-        //NAPRAVI GLAVNU NIT DA SACEKUJE OVU
+
+    public void loadFriends() {
         ExecutorService transThread = Executors.newSingleThreadExecutor();
         transThread.submit(new Runnable() {
             @Override
             public void run() {
                 try {
                     guiProgressStart("Fetching friend locations.");
-                    friends = HTTP.getAllFriends(username);
-                    for(int i=0; i<friends.size(); i++){
-                        User temp = friends.get(i);
+                    users = HTTP.getAllFriends(username);
+                    for (int i = 0; i < users.size(); i++) {
+                        User temp = users.get(i);
 
                         InputStream input = new java.net.URL(Constants.URL + temp.imagePath).openStream();
                         temp.image = BitmapFactory.decodeStream(input);
@@ -242,11 +271,36 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
             }
         });
         transThread.shutdown();
-        try{
+        try {
             transThread.awaitTermination(Long.MAX_VALUE, java.util.concurrent.TimeUnit.SECONDS);
 
         } catch (InterruptedException E) {
-        // handle
+            // handle
+        }
+    }
+
+    public void loadOnlineUsers() {
+        ExecutorService transThread = Executors.newSingleThreadExecutor();
+        transThread.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    guiProgressStart("Fetching friend locations.");
+                    onlineUsers = HTTP.getOnlineUsers();
+                    pd.cancel();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    pd.cancel();
+                }
+
+            }
+        });
+        transThread.shutdown();
+        try {
+            transThread.awaitTermination(Long.MAX_VALUE, java.util.concurrent.TimeUnit.SECONDS);
+
+        } catch (InterruptedException E) {
+            // handle
         }
     }
 
@@ -255,49 +309,54 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
         switch (item.getItemId()) {
             case R.id.show_friends:
                 loadFriends();
-                for(int i = 0; i < this.friends.size(); i++)
-                {
-                    User u = friends.get(i);
+                for (int i = 0; i < this.users.size(); i++) {
+                    User u = users.get(i);
                     LatLng mark = new LatLng(u.latitude, u.longitude);
-                    BitmapDescriptor iconBitmap = BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(u.image,40,50,false));
+                    BitmapDescriptor iconBitmap = BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(u.image, 40, 50, false));
                     mMap.addMarker(new MarkerOptions().position(mark).title(u.username)
                             .icon(iconBitmap)).setTag(56);
 
                 }
                 break;
-/*            case R.id.get_friends:
-                break;*/
-            case R.id.select_loc_item:
-                this.selCoordsEnabled = true;
-                Toast.makeText(this, "Tap a location", Toast.LENGTH_SHORT).show();
+
+            case R.id.show_online_users_item:
+                loadOnlineUsers();
+                for (int i = 0; i < this.onlineUsers.size(); i++) {
+                    User u = onlineUsers.get(i);
+                    LatLng mark = new LatLng(u.latitude, u.longitude);
+                    mMap.addMarker(new MarkerOptions().position(mark).title(u.username));
+                }
                 break;
+
             case R.id.select_loc_cancel_item:
                 setResult(Activity.RESULT_CANCELED);
                 finish();
                 break;
-            case android.R.id.home:
-                // todo: goto back activity from here
 
+            case R.id.search_arenas_by_distance:
+                this.radius= true;
+                InputDialogFragment.title="Enter radius:";
+                showNoticeDialog();
+                break;
+
+            case R.id.search_arenas_by_name:
+                this.radius = false;
+                InputDialogFragment.title="Enter arena title:";
+                showNoticeDialog();
+                break;
+
+            case android.R.id.home:
                 finish();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
@@ -310,7 +369,6 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
         buildGoogleApiClient();
         mMap.setMyLocationEnabled(true);
         //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         mMap.setOnMarkerClickListener(this);
 
         mLocationCallback = new LocationCallback() {
@@ -321,7 +379,9 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                     mMap.addMarker(new MarkerOptions().position(mark).title(username));
 
                 }
-            };
+            }
+
+            ;
         };
     }
 
@@ -377,17 +437,13 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+
     private void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
-            // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
                 new AlertDialog.Builder(this)
                         .setTitle("Location Permission Needed")
                         .setMessage("This app needs the Location permission, please accept to use location functionality")
@@ -397,7 +453,7 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                                 //Prompt the user once explanation has been shown
                                 ActivityCompat.requestPermissions(UsersMapActivity.this,
                                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                        MY_PERMISSIONS_REQUEST_LOCATION );
+                                        MY_PERMISSIONS_REQUEST_LOCATION);
                             }
                         })
                         .create()
@@ -408,7 +464,7 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                 // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_LOCATION );
+                        MY_PERMISSIONS_REQUEST_LOCATION);
             }
         }
     }
@@ -442,11 +498,8 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                 }
                 return;
             }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
-    }
 
+    }
 }
 

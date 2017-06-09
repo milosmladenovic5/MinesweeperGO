@@ -82,9 +82,7 @@ public class UserPanelActivity extends AppCompatActivity implements View.OnClick
         Button uploadBtn = (Button) findViewById(R.id.upUploadBtn);
 
         if(homeUser.username.equals(visitingUser.username)){
-            Intent in = new Intent(UserPanelActivity.this, MinesweeperService.class);
-            in.putExtra("Username", homeUser.username);
-            startService(in);
+
 
             uploadBtn.setOnClickListener(this);
         }
@@ -171,7 +169,17 @@ public class UserPanelActivity extends AppCompatActivity implements View.OnClick
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.clear();
                 editor.commit();
-                stopService(new Intent(UserPanelActivity.this, MinesweeperService.class) );
+                ExecutorService transThread = Executors.newSingleThreadExecutor();
+                transThread.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            HTTP.logout(homeUser.username);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
 
                 Intent i = new Intent(this, MainActivity.class);
                 startActivity(i);
@@ -186,13 +194,19 @@ public class UserPanelActivity extends AppCompatActivity implements View.OnClick
                 inte.putExtra("Username",this.visitingUser.username);
                 startActivity(inte);
                 break;
+            case R.id.item_start_service:
+                Intent intent = new Intent(UserPanelActivity.this, MinesweeperService.class);
+                intent.putExtra("Username", homeUser.username);
+                startService(intent);
+                break;
+            case R.id.item_stop_service:
+                stopService(new Intent(UserPanelActivity.this, MinesweeperService.class) );
+                break;
             case android.R.id.home:
-                // todo: goto back activity from here
-
                 if(this.visitingCall==true)
                     finishActivity(1);
                 finish();
-                return true;
+               break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -234,8 +248,6 @@ public class UserPanelActivity extends AppCompatActivity implements View.OnClick
                 fo.close();
             } catch (Exception e) {
                 e.printStackTrace();
-
-
             }
             ExecutorService transThread = Executors.newSingleThreadExecutor();
             transThread.submit(new Runnable() {

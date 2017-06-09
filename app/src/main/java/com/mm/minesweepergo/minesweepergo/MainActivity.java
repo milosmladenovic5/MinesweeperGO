@@ -114,7 +114,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.clear();
         editor.commit();
-        stopService(new Intent(MainActivity.this, MinesweeperService.class) );
     }
 
     public  User readUserPreferences()
