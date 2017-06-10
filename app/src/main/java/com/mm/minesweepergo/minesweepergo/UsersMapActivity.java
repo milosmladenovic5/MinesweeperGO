@@ -46,6 +46,8 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.mm.minesweepergo.minesweepergo.DomainModel.Arena;
 import com.mm.minesweepergo.minesweepergo.DomainModel.User;
 
@@ -85,7 +87,7 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
     public String dialogRetVal;
     private boolean radius;
     private List<Arena> playingArenas = new ArrayList<>();
-
+    private User user;
 
 
     double radiusInMeters = 100.0;
@@ -120,6 +122,13 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
         // Create an instance of the dialog fragment and show it
         DialogFragment dialog = new InputDialogFragment();
         dialog.show(getFragmentManager(),"Notice");
+    }
+
+    @Override
+    protected void onStop() {
+        Toast.makeText(this, "Otisao sam na drugu aktivnost.", Toast.LENGTH_LONG).show();
+
+        super.onStop();
     }
 
     @Override
@@ -178,6 +187,15 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                         .strokeColor(Color.RED)
                         .fillColor(0x220000FF)
                         .strokeWidth(3));
+
+                PolylineOptions rectOptions = new PolylineOptions()
+                        .add(new LatLng(43.33062694022334, 21.89498625432127))
+                        .add(new LatLng(43.33062691576371,21.89244233433097))  // North of the previous point, but at the same longitude
+                        .add(new LatLng(43.32766806767339, 21.89268252985606))  // Same latitude, and 30km to the west
+                        .add(new LatLng(43.328144128254515,21.89518780586673))  // Same longitude, and 16km to the south
+                        .add(new LatLng(43.33062694022334, 21.89498625432127)); // Closes the polyline.
+
+                mMap.addPolyline(rectOptions);
             }
         }
     }
@@ -186,6 +204,8 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
     public void onDialogNegativeClick(android.app.DialogFragment dialog) {
 
     }
+
+
 
     @Override
     public void onPause() {
@@ -203,27 +223,40 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
 */
         final String title = marker.getTitle();
 
-        ExecutorService transThread = Executors.newSingleThreadExecutor();
-        transThread.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    //guiProgressStart("Fetching user.");
-                    User user = HTTP.getUser(title);
-                    // pd.cancel();
-                    Intent i = new Intent(UsersMapActivity.this, UserPanelActivity.class);
-                    i.putExtra("userInfo", user);
-                    int req = 0;
-                    startActivityForResult(i, req);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //pd.cancel();
-                }
+        if(title!=this.username) {
+            ExecutorService transThread = Executors.newSingleThreadExecutor();
+            transThread.submit(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        //guiProgressStart("Fetching user.");
+                        user = HTTP.getUser(title);
+                        // pd.cancel();
 
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        //pd.cancel();
+                    }
+
+                }
+            });
+            transThread.shutdown();
+            try {
+                transThread.awaitTermination(Long.MAX_VALUE, java.util.concurrent.TimeUnit.SECONDS);
+                Intent i = new Intent(UsersMapActivity.this, UserPanelActivity.class);
+                i.putExtra("userInfo", user);
+                startActivity(i);
+
+            } catch (InterruptedException E) {
+                // handle
             }
-        });
+
+        }
+
         return false;
     }
+
+
 
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -325,8 +358,20 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
     }
 
     @Override
+    protected void onDestroy() {
+        Toast.makeText(this, "Neko me pozvao?", Toast.LENGTH_LONG).show();
+
+        super.onDestroy();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.match:
+                Intent matchIntent = new Intent(this,MatchActivity.class);
+                matchIntent.putExtra("Username",username);
+                startActivity(matchIntent);
+                break;
             case R.id.show_friends:
                 loadFriends();
                 for (int i = 0; i < this.users.size(); i++) {

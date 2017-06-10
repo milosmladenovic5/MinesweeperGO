@@ -48,51 +48,58 @@ public class UserPanelActivity extends AppCompatActivity implements View.OnClick
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_panel);
+        //ONCREATE se poziva dvaput zato sto je ovo bug
 
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.userPanelToolbar);
-        setSupportActionBar(myToolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        //u androidu glupom, kada kreiras novu aktivnost iz neke niti, !!!!!!!!!!!!!
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //BITNOO JAKO
 
-        Intent i = getIntent();
-        visitingUser = (User) i.getParcelableExtra("userInfo");
-        setImage();
-        homeUser = readUserPreferences();
+            setContentView(R.layout.activity_user_panel);
 
-        TextView usernamelbl = (TextView) findViewById(R.id.upUsernameLbl);
-        usernamelbl.setText(visitingUser.username);
-
-        TextView emailLbl = (TextView) findViewById(R.id.upEmailLbl);
-        emailLbl.setText(visitingUser.email);
-
-        TextView firstNameLbl = (TextView) findViewById(R.id.upFirstNamelbl);
-        firstNameLbl.setText("First name:\t\t\t\t" + visitingUser.firstName);
-
-        TextView lastNameLbl = (TextView) findViewById(R.id.upLastNameLbl);
-        lastNameLbl.setText("Last name: \t\t\t\t" + visitingUser.lastName);
-
-        TextView phoneNumberLbl = (TextView) findViewById(R.id.upPhoneNumberLbl);
-        phoneNumberLbl.setText("Phone number: \t\t\t\t" + visitingUser.phoneNumber);
-
-        int permissionCheck = 0;
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
-                permissionCheck);
-
-        Button uploadBtn = (Button) findViewById(R.id.upUploadBtn);
-
-        if(homeUser.username.equals(visitingUser.username)){
+            Toolbar myToolbar = (Toolbar) findViewById(R.id.userPanelToolbar);
+            setSupportActionBar(myToolbar);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            homeUser = new User();
+            visitingUser = new User();
 
 
-            uploadBtn.setOnClickListener(this);
-        }
-        else{
-            uploadBtn.setVisibility(View.GONE);
-            visitingCall = true;
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            Intent i = getIntent();
+            visitingUser = (User) i.getParcelableExtra("userInfo");
+            setImage();
+            homeUser = readUserPreferences();
 
-        }
+            TextView usernamelbl = (TextView) findViewById(R.id.upUsernameLbl);
+            usernamelbl.setText(visitingUser.username);
+
+            TextView emailLbl = (TextView) findViewById(R.id.upEmailLbl);
+            emailLbl.setText(visitingUser.email);
+
+            TextView firstNameLbl = (TextView) findViewById(R.id.upFirstNamelbl);
+            firstNameLbl.setText("First name:\t\t\t\t" + visitingUser.firstName);
+
+            TextView lastNameLbl = (TextView) findViewById(R.id.upLastNameLbl);
+            lastNameLbl.setText("Last name: \t\t\t\t" + visitingUser.lastName);
+
+            TextView phoneNumberLbl = (TextView) findViewById(R.id.upPhoneNumberLbl);
+            phoneNumberLbl.setText("Phone number: \t\t\t\t" + visitingUser.phoneNumber);
+
+            int permissionCheck = 0;
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
+                    permissionCheck);
+
+            Button uploadBtn = (Button) findViewById(R.id.upUploadBtn);
+
+            if (homeUser.username.equals(visitingUser.username)) {
+                uploadBtn.setOnClickListener(this);
+            } else {
+                uploadBtn.setVisibility(View.GONE);
+                visitingCall = true;
+                getSupportActionBar().setDisplayShowHomeEnabled(true);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+            }
+
     }
 
 
@@ -152,11 +159,18 @@ public class UserPanelActivity extends AppCompatActivity implements View.OnClick
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        if(this.visitingUser.username.equals(homeUser.username)){
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.menu_user_panel, menu);
+        try {
+
+            if (this.visitingUser.username.equals(homeUser.username)) {
+                MenuInflater inflater = getMenuInflater();
+                inflater.inflate(R.menu.menu_user_panel, menu);
+            }
+            return true;
         }
-        return true;
+        catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -203,9 +217,18 @@ public class UserPanelActivity extends AppCompatActivity implements View.OnClick
                 stopService(new Intent(UserPanelActivity.this, MinesweeperService.class) );
                 break;
             case android.R.id.home:
-                if(this.visitingCall==true)
-                    finishActivity(1);
-                finish();
+                try {
+                    if(this.visitingCall==true)
+                        finishActivity(1);
+
+                    super. onBackPressed();
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
                break;
         }
         return super.onOptionsItemSelected(item);

@@ -17,6 +17,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,8 +41,6 @@ import java.util.concurrent.Executors;
 
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
-
-
     User user = new User();
     List<String> usernames = null;
 
@@ -95,7 +95,24 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         getUsernames();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+                finish();
+                return true;
 
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_register, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
     @Override
     public void onClick(View v) {
@@ -160,6 +177,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         try
                         {
                             HTTP.createUser(user);
+                            finishActivity(1);
 
                         }
                         catch (Exception e)

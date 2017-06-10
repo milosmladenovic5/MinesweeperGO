@@ -29,20 +29,21 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
-            android:noHistory="true">
+            android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RegisterActivity"
-            android:parentActivityName=".MainActivity">
-                <meta-data
-                  android:name="android.support.PARENT_ACTIVITY"
-                 android:value="com.mm.minesweepergo.minesweepergo.MainActivity" />
-           </activity>
+        <activity
+            android:name=".RegisterActivity"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.mm.minesweepergo.minesweepergo.MainActivity" />
+        </activity>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -106,6 +107,14 @@
             </intent-filter>
         </receiver>
 
+        <activity android:name=".MatchActivity"
+            android:label="Match"
+            android:parentActivityName=".UsersMapActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.mm.minesweepergo.minesweepergo.UsersMapActivity" />
+            ></activity>
     </application>
 
 </manifest>

@@ -22,7 +22,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static android.support.v4.content.PermissionChecker.PERMISSION_GRANTED;
-import static com.mm.minesweepergo.minesweepergo.Utilities.readUserPreferences;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -30,6 +29,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private User user = null;
     private Context context;
     private Handler guiThread;
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,10 +65,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if(!user.username.equals("empty")) {
                     Intent i = new Intent(MainActivity.this, UserPanelActivity.class);
                     i.putExtra("userInfo", user);
-                    //  byte [] array = Utilities.getByteArrayFromBitmap(user.image);
-                    //  i.putExtra("image", array);
-
-                    // i.putExtra("bitmap", user.image);
 
                     startActivity(i);
                 }
@@ -82,6 +84,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         a.addCategory(Intent.CATEGORY_HOME);
         a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(a);
+
+        Context context = MainActivity.this;
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                "UserInfo", Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.clear();
+        editor.commit();
 
         super.onBackPressed();
     }
@@ -104,17 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Context context = MainActivity.this;
-        SharedPreferences sharedPref = context.getSharedPreferences(
-                "UserInfo", Context.MODE_PRIVATE);
 
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.clear();
-        editor.commit();
-    }
 
     public  User readUserPreferences()
     {
@@ -139,15 +139,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.liRegisterBtn:
-                Intent i = new Intent(this, RegisterActivity.class);
-                startActivity(i);
+                int resCode = 0;
+                Intent i = new Intent(MainActivity.this, RegisterActivity.class);
+                startActivityForResult(i,resCode);
                 break;
+
             case R.id.liLoginBtn:
                 if (!isOnline()) {
                     Toast.makeText(this, "No internet connection!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
                 getUser();
                 break;
         }

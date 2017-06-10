@@ -2,18 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.jajac.myplaces.com.example.jajac.mypl.MyPlacesMapActivity">
+    tools:context="com.mm.minesweepergo.minesweepergo.UsersMapActivity">
+
     <item
-        android:id="@+id/show_friends"
-        android:title="Show friends"
+        android:id="@+id/match"
+        android:title="Match"
         android:orderInCategory="100"
         app:showAsAction="ifRoom" />
 
-<!--    <item
-        android:id="@+id/get_friends"
-        android:title="Get friends"
+    <item
+        android:id="@+id/show_friends"
+        android:title="Show online friends"
         android:orderInCategory="100"
-        app:showAsAction="never" />-->
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/show_online_users_item"

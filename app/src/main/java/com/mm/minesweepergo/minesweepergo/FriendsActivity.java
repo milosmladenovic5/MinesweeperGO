@@ -263,11 +263,9 @@ public class FriendsActivity extends AppCompatActivity {
 
             this.SearchNewDevices();
 
-        }
-        if(id==android.R.id.home){
-        // todo: goto back activity from here
-        finish();
-        return true;
+        }else if(id==android.R.id.home){
+            finish();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
