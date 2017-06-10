@@ -6,23 +6,41 @@
     android:layout_height="match_parent"
     tools:context="com.mm.minesweepergo.minesweepergo.RegisterActivity">
 
+
     <RelativeLayout
-        android:layout_width="371dp"
-        android:layout_height="508dp"
-        android:layout_marginLeft="7dp"
+        android:layout_width="393dp"
+        android:layout_height="fill_parent"
+        android:layout_marginLeft="0dp"
+        android:layout_marginStart="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        tools:layout_editor_absoluteY="1dp">
+        app:layout_constraintTop_toTopOf="parent">
+
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.AppBarOverlay"
+            android:id="@+id/appBarLayout"/>
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/register_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            android:layout_below="@+id/appBarLayout"
+            android:layout_alignParentStart="true" />
 
         <EditText
             android:id="@+id/rgUsername"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="42dp"
+            android:layout_marginTop="10dp"
             android:ems="10"
             android:hint="Username"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:layout_below="@+id/register_toolbar"
+            android:layout_centerHorizontal="true" />
 
         <EditText
             android:id="@+id/rgFirstName"
@@ -30,7 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_alignStart="@+id/rgConfirmPassword"
             android:layout_below="@+id/rgConfirmPassword"
-            android:layout_marginTop="13dp"
+            android:layout_marginTop="8dp"
             android:ems="10"
             android:hint="First name"
             android:inputType="textPersonName" />
@@ -41,7 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_alignStart="@+id/rgFirstName"
             android:layout_below="@+id/rgFirstName"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="11dp"
             android:ems="10"
             android:hint="Last name"
             android:inputType="textPersonName" />
@@ -52,7 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_alignStart="@+id/rgLastName"
             android:layout_below="@+id/rgLastName"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="11dp"
             android:ems="10"
             android:hint="Email"
             android:inputType="textPersonName" />
@@ -63,12 +81,12 @@
             android:layout_height="wrap_content"
             android:layout_alignStart="@+id/rgUsername"
             android:layout_below="@+id/rgUsername"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="9dp"
             android:ems="10"
             android:hint="Password"
             android:inputType="textPassword" />
 
-        <Button
+        <!--        <Button
             android:id="@+id/rgPictureBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -76,15 +94,15 @@
             android:layout_alignStart="@+id/rgEmail"
             android:layout_marginBottom="44dp"
             android:backgroundTint="@android:color/holo_blue_light"
-            android:text="Picture" />
+            android:text="Picture" />-->
 
         <Button
             android:id="@+id/rgRegisterBtn"
-            android:layout_width="wrap_content"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/rgPictureBtn"
-            android:layout_alignBottom="@+id/rgPictureBtn"
-            android:layout_alignEnd="@+id/rgEmail"
+            android:layout_below="@+id/rgPhone"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="7dp"
             android:backgroundTint="@color/colorPrimary"
             android:text="Register" />
 
@@ -103,8 +121,9 @@
             android:id="@+id/rgPhone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/rgPictureBtn"
-            android:layout_alignEnd="@+id/rgRegisterBtn"
+            android:layout_alignStart="@+id/rgEmail"
+            android:layout_below="@+id/rgEmail"
+            android:layout_marginTop="7dp"
             android:ems="10"
             android:hint="Phone number"
             android:inputType="textPersonName|phone" />

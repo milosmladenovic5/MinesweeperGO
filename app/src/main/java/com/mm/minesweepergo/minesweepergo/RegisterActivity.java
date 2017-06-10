@@ -15,6 +15,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -81,6 +82,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         Button registerBtn = (Button) findViewById(R.id.rgRegisterBtn);
         registerBtn.setOnClickListener(this);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.register_toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
         int permCheck = 0;
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.BLUETOOTH},
@@ -94,10 +100,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.rgPictureBtn:
-            break;
-
-
             case R.id.rgRegisterBtn:
                 EditText usernameET = (EditText)findViewById(R.id.rgUsername);
                 EditText passwordET = (EditText)findViewById(R.id.rgPassword);

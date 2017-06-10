@@ -50,7 +50,9 @@ import com.mm.minesweepergo.minesweepergo.DomainModel.Arena;
 import com.mm.minesweepergo.minesweepergo.DomainModel.User;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -82,6 +84,8 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
     private List<User> onlineUsers;
     public String dialogRetVal;
     private boolean radius;
+    private List<Arena> playingArenas = new ArrayList<>();
+
 
 
     double radiusInMeters = 100.0;
@@ -120,46 +124,62 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
 
     @Override
     public void onDialogPositiveClick(android.app.DialogFragment dialog) {
+        ExecutorService transThread = Executors.newSingleThreadExecutor();
         if(radius) {
             //ovde je imeplementirano trazenje po  radiusu
-            Toast.makeText(this, InputDialogFragment.name , Toast.LENGTH_LONG).show();
             this.dialogRetVal= InputDialogFragment.name;
-            ExecutorService transThread = Executors.newSingleThreadExecutor();
             transThread.submit(new Runnable() {
                 @Override
                 public void run() {
                     try {
 
-                        List<Arena> arenas = HTTP.getArenasByDistance(mLastLocation.getLatitude(),mLastLocation.getLongitude(), Double.parseDouble(dialogRetVal));
-
-                        Toast.makeText(UsersMapActivity.this, arenas.get(0).name, Toast.LENGTH_LONG).show();
+                        playingArenas = HTTP.getArenasByDistance(mLastLocation.getLatitude(),mLastLocation.getLongitude(), Double.parseDouble(dialogRetVal));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        //pd.cancel();
                     }
                 }
             });
         }
         else{
             //trazenje po imenu arene je ovde implementirano
-            Toast.makeText(this, InputDialogFragment.name , Toast.LENGTH_LONG).show();
             this.dialogRetVal= InputDialogFragment.name;
-            ExecutorService transThread = Executors.newSingleThreadExecutor();
             transThread.submit(new Runnable() {
                 @Override
                 public void run() {
                     try {
 
-                        Arena arena = HTTP.getArena(dialogRetVal);
-                        Toast.makeText(UsersMapActivity.this, arena.name, Toast.LENGTH_LONG).show();
+                       playingArenas.add( HTTP.getArena(dialogRetVal));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        //pd.cancel();
                     }
                 }
             });
         }
+        transThread.shutdown();
+        try {
+            transThread.awaitTermination(Long.MAX_VALUE, java.util.concurrent.TimeUnit.SECONDS);
 
+        } catch (InterruptedException E) {
+            // handle
+        }
+
+        drawArenas();
+    }
+
+
+    public void drawArenas(){
+        if(this.playingArenas.size()!=0)
+        {
+            for (Iterator<Arena> a = playingArenas.iterator(); a.hasNext();) {
+                Arena ar = a.next();
+                Circle circle = mMap.addCircle(new CircleOptions()
+                        .center(new LatLng(ar.centerLat, ar.centerLon))
+                        .radius(ar.radius)
+                        .strokeColor(Color.RED)
+                        .fillColor(0x220000FF)
+                        .strokeWidth(3));
+            }
+        }
     }
 
     @Override
@@ -335,7 +355,7 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
 
             case R.id.search_arenas_by_distance:
                 this.radius= true;
-                InputDialogFragment.title="Enter radius:";
+                InputDialogFragment.title="Enter radius (in meters) :";
                 showNoticeDialog();
                 break;
 
@@ -423,8 +443,8 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
         mCurrLocationMarker = mMap.addMarker(markerOptions);
 
-        CircleOptions addCircle = new CircleOptions().center(latLng).radius(radiusInMeters).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8);
-        mCircle = mMap.addCircle(addCircle);
+      /*  CircleOptions addCircle = new CircleOptions().center(latLng).radius(radiusInMeters).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8);
+        mCircle = mMap.addCircle(addCircle);*/
 
         //move map camera
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -474,7 +494,6 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_LOCATION: {
-                // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
@@ -491,9 +510,6 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                     }
 
                 } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                     Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show();
                 }
                 return;

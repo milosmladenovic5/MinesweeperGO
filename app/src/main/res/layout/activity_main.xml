@@ -8,53 +8,66 @@
 
 
     <RelativeLayout
-        android:layout_width="368dp"
-        android:layout_height="495dp"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         tools:layout_editor_absoluteX="8dp"
         tools:layout_editor_absoluteY="8dp">
+        <!--
+                android:background="@drawable/back"
+        -->
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            app:srcCompat="@drawable/icon_minesweeper"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="42dp" />
 
         <EditText
             android:id="@+id/liUsername"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
+            android:layout_below="@+id/imageView"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="71dp"
+            android:layout_marginTop="12dp"
             android:ems="10"
             android:hint="Username"
             android:inputType="textPersonName"
-            android:text="m" />
+            android:text="Mm" />
 
         <EditText
             android:id="@+id/liPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/liUsername"
-            android:layout_below="@+id/liUsername"
-            android:layout_marginTop="21dp"
+            android:layout_marginTop="9dp"
             android:ems="10"
             android:hint="Password"
             android:inputType="textPassword"
-            android:text="m" />
+            android:text="mm"
+            android:layout_below="@+id/liUsername"
+            android:layout_alignStart="@+id/liUsername" />
 
         <Button
             android:id="@+id/liLoginBtn"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_alignStart="@+id/liPassword"
             android:layout_below="@+id/liPassword"
             android:layout_marginTop="28dp"
-            android:background="@color/colorPrimary"
+            android:background="?android:attr/colorPrimary"
             android:text="Login" />
 
         <Button
             android:id="@+id/liRegisterBtn"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@+id/liLoginBtn"
             android:layout_alignBottom="@+id/liLoginBtn"
             android:layout_alignEnd="@+id/liPassword"
-            android:background="@android:color/holo_red_dark"
+            android:background="#990099cc"
             android:text="Register" />
+
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>

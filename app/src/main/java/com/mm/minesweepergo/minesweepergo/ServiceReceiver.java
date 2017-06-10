@@ -32,7 +32,7 @@ public class ServiceReceiver extends BroadcastReceiver {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.icon_minesweeper)
-                        .setContentTitle("Friends nearby")
+                        .setContentTitle("MinesweeperGO")
                         .setContentText("There are " + friendsCount + " friends nearby. Tap to see them on map.");
 
 

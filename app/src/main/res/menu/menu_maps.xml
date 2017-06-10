@@ -20,6 +20,7 @@
         android:title="Show online users"
         android:orderInCategory="100"
         app:showAsAction="never" />
+
     <item
         android:id="@+id/select_loc_cancel_item"
         android:title="Close map"
