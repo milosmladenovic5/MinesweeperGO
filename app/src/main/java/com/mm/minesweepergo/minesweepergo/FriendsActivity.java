@@ -78,7 +78,7 @@ public class FriendsActivity extends AppCompatActivity {
 
         Bundle bnd = getIntent().getExtras();
         if (bnd != null)
-            userName = bnd.getString("UserName");
+            userName = bnd.getString("Username");
 
         listPairedDevices = new ArrayList<String>();
         listAllDevices = new ArrayList<String>();
@@ -137,7 +137,6 @@ public class FriendsActivity extends AppCompatActivity {
         });
 
     }
-
 
     private void Init() {
         txtFriends = (TextView) findViewById(R.id.txtFriendsList);
@@ -200,9 +199,12 @@ public class FriendsActivity extends AppCompatActivity {
                         try {
                             Boolean isBonded = false;
 
-                            for (User u : users) {
-                                if (u.btDevice.equals(bdDevice.getAddress()))
-                                    isBonded = true;
+                            if(users!=null)
+                            {
+                                for (User u : users) {
+                                    if (u.btDevice.equals(bdDevice.getAddress()))
+                                        isBonded = true;
+                                }
                             }
                             if (!isBonded) {
                                 MakeToast("Trying to create friendship...");

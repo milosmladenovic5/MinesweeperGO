@@ -201,6 +201,7 @@ public class UserPanelActivity extends AppCompatActivity implements View.OnClick
                 return true;
             case R.id.item_friends:
                 Intent in = new Intent(this, FriendsActivity.class);
+                in.putExtra("Username", this.homeUser.username);
                 startActivity(in);
                 break;
             case R.id.item_users_map:

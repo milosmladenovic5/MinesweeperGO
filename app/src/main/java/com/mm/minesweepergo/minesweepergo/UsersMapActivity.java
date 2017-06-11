@@ -181,7 +181,8 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
         {
             for (Iterator<Arena> a = playingArenas.iterator(); a.hasNext();) {
                 Arena ar = a.next();
-                Circle circle = mMap.addCircle(new CircleOptions()
+
+                mMap.addCircle(new CircleOptions()
                         .center(new LatLng(ar.centerLat, ar.centerLon))
                         .radius(ar.radius)
                         .strokeColor(Color.RED)
@@ -205,8 +206,6 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
 
     }
 
-
-
     @Override
     public void onPause() {
         super.onPause();
@@ -228,14 +227,13 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
             transThread.submit(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        //guiProgressStart("Fetching user.");
+                    try
+                    {
                         user = HTTP.getUser(title);
-                        // pd.cancel();
-
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         e.printStackTrace();
-                        //pd.cancel();
                     }
 
                 }
@@ -255,8 +253,6 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
 
         return false;
     }
-
-
 
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -359,7 +355,6 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
 
     @Override
     protected void onDestroy() {
-        Toast.makeText(this, "Neko me pozvao?", Toast.LENGTH_LONG).show();
 
         super.onDestroy();
     }
