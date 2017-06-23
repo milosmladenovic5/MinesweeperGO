@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.net.ssl.HttpsURLConnection;
+
 /**
  * Created by Milan Nikolić on 31-May-17.
  */

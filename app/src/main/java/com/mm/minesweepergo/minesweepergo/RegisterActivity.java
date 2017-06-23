@@ -167,7 +167,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 user.password = password;
                 user.email = email;
                 user.phoneNumber = phone;
-                user.btDevice = ba.getAddress();
+                if(ba != null)
+                    user.btDevice = ba.getAddress();
+                else
+                    user.btDevice = "emulator error fix";
 
                 transThread.submit(new Runnable() {
 
@@ -177,7 +180,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         try
                         {
                             HTTP.createUser(user);
-                            finishActivity(1);
+
+                            //finishActivity(1);
 
                         }
                         catch (Exception e)
@@ -186,6 +190,19 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         }
                     }
                 });
+                transThread.shutdown();
+                try {
+                    transThread.awaitTermination(Long.MAX_VALUE, java.util.concurrent.TimeUnit.SECONDS);
+
+                } catch (InterruptedException E) {
+                    // handle
+                    return;
+                }
+
+                Toast.makeText(this, "Successful registration!", Toast.LENGTH_SHORT).show();
+
+                Intent i = new Intent(RegisterActivity.this, MainActivity.class);
+                startActivity(i);
         }
     }
 }
