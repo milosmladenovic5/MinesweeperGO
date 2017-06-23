@@ -55,6 +55,11 @@ public class User implements Parcelable{
         this.btDevice = in.readString();
     }
 
+    @Override
+    public String toString() {
+        return username;
+    }
+
     public User(Parcel in)
     {
         readFromParcel(in);

@@ -28,8 +28,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".MainActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -107,14 +106,27 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".MatchActivity"
+        <activity
+            android:name=".MatchActivity"
             android:label="Match"
             android:parentActivityName=".UsersMapActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.mm.minesweepergo.minesweepergo.UsersMapActivity" />
-            ></activity>
+            >
+        </activity>
+
+        <activity
+            android:name=".ArenaActivity"
+            android:label="Arena"
+            android:parentActivityName=".UsersMapActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.mm.minesweepergo.minesweepergo.UsersMapActivity" />
+        </activity>
+
     </application>
 
 </manifest>

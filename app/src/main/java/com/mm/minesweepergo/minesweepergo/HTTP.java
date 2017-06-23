@@ -7,8 +7,11 @@ import android.renderscript.ScriptGroup;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.mm.minesweepergo.minesweepergo.Constants;
 import com.mm.minesweepergo.minesweepergo.DomainModel.Arena;
+import com.mm.minesweepergo.minesweepergo.DomainModel.Game;
+import com.mm.minesweepergo.minesweepergo.DomainModel.Mine;
 import com.mm.minesweepergo.minesweepergo.DomainModel.User;
 
 import org.json.JSONArray;
@@ -96,7 +99,8 @@ public class HTTP {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 retStr = inputStreamToString(conn.getInputStream());
             } else
-                retStr = String.valueOf("Error: " + responseCode);
+                //retStr = String.valueOf("Error: " + responseCode);
+                retStr = "Error";
 
             Log.e("http", retStr);
 
@@ -722,5 +726,117 @@ public class HTTP {
     }
 
 
+
+    public static List<Game> getArenaGames(String arenaName)
+    {
+        List<Game> games = new ArrayList<Game>();
+        try {
+            URL url = new URL(Constants.URL + "/api/getArenaGames");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(10000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+
+            JSONObject body = new JSONObject();
+
+            body.put("arenaName", arenaName);
+
+            Uri.Builder builder = new Uri.Builder().appendQueryParameter("action", body.toString());
+            String query = builder.build().getEncodedQuery();
+
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            bw.write(query);
+
+            bw.flush();
+            bw.close();
+            os.close();
+            int responseCode = conn.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                String str = inputStreamToString(conn.getInputStream());
+                JSONArray jsonArray = new JSONArray(str);
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObjectOrg = new JSONObject(jsonArray.getString(i));
+
+                    JSONObject jsonObject = jsonObjectOrg.getJSONObject("properties");
+
+                    Game game = new Game();
+
+                    game.setId(jsonObject.getInt("GameId")); // SUMLJAM da ce j* int da radi
+                    game.setCreatorUsername(jsonObject.getString("CreatorUsername"));
+
+                    games.add(game);
+
+                }
+            } else
+                Log.e("HTTPCOde_Error", String.valueOf(responseCode));
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        return games;
+    }
+
+    public static List<Mine> getMines(int gameId)
+    {
+        List<Mine> mines = new ArrayList<Mine>();
+        try {
+            URL url = new URL(Constants.URL + "/api/getMines");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(10000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+
+            JSONObject body = new JSONObject();
+
+            body.put("gameId", gameId);
+
+            Uri.Builder builder = new Uri.Builder().appendQueryParameter("action", body.toString());
+            String query = builder.build().getEncodedQuery();
+
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            bw.write(query);
+
+            bw.flush();
+            bw.close();
+            os.close();
+            int responseCode = conn.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                String str = inputStreamToString(conn.getInputStream());
+                JSONArray jsonArray = new JSONArray(str);
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObjectOrg = new JSONObject(jsonArray.getString(i));
+
+                    JSONObject jsonObject = jsonObjectOrg.getJSONObject("properties");
+
+
+                    LatLng location = new LatLng(jsonObject.getDouble("Latitude"), jsonObject.getDouble("Longitude"));
+                    Mine mine = new Mine(location, jsonObject.getDouble("BlastRadius"));
+
+
+                    mines.add(mine);
+
+                }
+            } else
+                Log.e("HTTPCOde_Error", String.valueOf(responseCode));
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        return mines;
+    }
 
 }
