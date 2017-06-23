@@ -760,13 +760,14 @@ public class HTTP {
                 JSONArray jsonArray = new JSONArray(str);
 
                 for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject jsonObjectOrg = new JSONObject(jsonArray.getString(i));
+                    JSONObject jsonObject = new JSONObject(jsonArray.getString(i));
 
-                    JSONObject jsonObject = jsonObjectOrg.getJSONObject("properties");
+                    //JSONObject jsonObject = jsonObjectOrg.getJSONObject("properties");
 
                     Game game = new Game();
 
-                    game.setId(jsonObject.getInt("GameId")); // SUMLJAM da ce j* int da radi
+
+                    game.setId(Integer.parseInt(jsonObject.getString("GameId"))); // SUMLJAM da ce j* int da radi
                     game.setCreatorUsername(jsonObject.getString("CreatorUsername"));
 
                     games.add(game);
