@@ -44,10 +44,10 @@ import com.mm.minesweepergo.minesweepergo.DomainModel.User;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mm.minesweepergo.minesweepergo.R.id.map;
 import static com.mm.minesweepergo.minesweepergo.R.id.match_map;
+import static com.mm.minesweepergo.minesweepergo.R.id.minesset_map;
 
-public class MatchActivity extends AppCompatActivity implements OnMapReadyCallback,GoogleMap.OnMarkerClickListener, GoogleApiClient.OnConnectionFailedListener,LocationListener,GoogleApiClient.ConnectionCallbacks, InputDialogFragment.NoticeDialogListener {
+public class MinesSetActivity extends AppCompatActivity implements OnMapReadyCallback,GoogleMap.OnMarkerClickListener, GoogleApiClient.OnConnectionFailedListener,LocationListener,GoogleApiClient.ConnectionCallbacks, InputDialogFragment.NoticeDialogListener {
 
     private GoogleMap mMap;
     private SupportMapFragment mapFragment;
@@ -72,15 +72,15 @@ public class MatchActivity extends AppCompatActivity implements OnMapReadyCallba
     protected void onCreate(Bundle savedInstanceState) {
         context = this;
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_match);
+        setContentView(R.layout.activity_minesset);
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(match_map);
+                .findFragmentById(minesset_map);
         mapFragment.getMapAsync(this);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.match_map_toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.minesset_map_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);

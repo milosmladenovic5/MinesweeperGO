@@ -13,7 +13,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -46,14 +45,12 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.mm.minesweepergo.minesweepergo.DomainModel.Arena;
 import com.mm.minesweepergo.minesweepergo.DomainModel.User;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -363,7 +360,7 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.match:
-                Intent matchIntent = new Intent(this,MatchActivity.class);
+                Intent matchIntent = new Intent(this,MinesSetActivity.class);
                 matchIntent.putExtra("Username",username);
                 startActivity(matchIntent);
                 break;

@@ -5,11 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.mm.minesweepergo.minesweepergo.UsersMapActivity"
-    tools:showIn="@layout/activity_users_map">
+    tools:context="com.mm.minesweepergo.minesweepergo.MinesSetActivity"
+    tools:showIn="@layout/activity_minesset">
 
     <fragment
-        android:id="@+id/match_map"
+        android:id="@+id/minesset_map"
         class="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"

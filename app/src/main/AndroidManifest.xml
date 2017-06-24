@@ -107,7 +107,7 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".MatchActivity"
+        <activity android:name=".MinesSetActivity"
             android:label="Match"
             android:parentActivityName=".UsersMapActivity"
             android:theme="@style/AppTheme.NoActionBar">
