@@ -179,9 +179,14 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     {
                         try
                         {
-                            HTTP.createUser(user);
+                            String result = HTTP.createUser(user);
+                            if(!result.equals("Error"))
+                                Toast.makeText(RegisterActivity.this, "Successful registration!", Toast.LENGTH_SHORT).show();
+                            else
+                                Toast.makeText(RegisterActivity.this, "Error!", Toast.LENGTH_SHORT).show();
 
-                            //finishActivity(1);
+
+                            finishActivity(1);
 
                         }
                         catch (Exception e)
@@ -190,19 +195,19 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         }
                     }
                 });
-                transThread.shutdown();
-                try {
-                    transThread.awaitTermination(Long.MAX_VALUE, java.util.concurrent.TimeUnit.SECONDS);
+//                transThread.shutdown();
+//                try {
+//                    transThread.awaitTermination(Long.MAX_VALUE, java.util.concurrent.TimeUnit.SECONDS);
+//
+//                } catch (InterruptedException E) {
+//                    // handle
+//                    return;
+//                }
 
-                } catch (InterruptedException E) {
-                    // handle
-                    return;
-                }
 
-                Toast.makeText(this, "Successful registration!", Toast.LENGTH_SHORT).show();
 
-                Intent i = new Intent(RegisterActivity.this, MainActivity.class);
-                startActivity(i);
+//                Intent i = new Intent(RegisterActivity.this, MainActivity.class);
+//                startActivity(i);
         }
     }
 }

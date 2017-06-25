@@ -48,10 +48,10 @@ public class FriendsActivity extends AppCompatActivity {
     ArrayList<String> listAllDevices;
     BluetoothAdapter bluetoothAdapter;
     ArrayAdapter<String> adapterPaired;
+
     ArrayAdapter<String> adapterAll;
     private ProgressDialog mProgressDlg;
     private BluetoothDevice bdDevice;
-    private BluetoothDevice bdDeviceFriend;
     TextView txtFriends, txtSearch;
     int index = -1;
     private String userName;
@@ -90,6 +90,7 @@ public class FriendsActivity extends AppCompatActivity {
         adapterPaired = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listPairedDevices);
         adapterAll = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_single_choice, listAllDevices);
 
+
         this.Init();
         this.getPairedDevices();
         this.CreateProgressDialog();
@@ -99,7 +100,6 @@ public class FriendsActivity extends AppCompatActivity {
     private void MakeFriends(BluetoothDevice bdDevice) {
         final String address = bdDevice.getAddress();
 
-        //Log.e("BT_DEVICE2", address);
         ExecutorService transThread = Executors.newSingleThreadExecutor();
         transThread.submit(new Runnable() {
             @Override
@@ -135,7 +135,6 @@ public class FriendsActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     private void Init() {
@@ -143,6 +142,7 @@ public class FriendsActivity extends AppCompatActivity {
         txtSearch = (TextView) findViewById(R.id.txtSearchList);
         lvPaired = (ListView) findViewById(R.id.listViewParied);
         lvPaired.setAdapter(adapterPaired);
+
         lvPaired.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {

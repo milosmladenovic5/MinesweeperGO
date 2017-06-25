@@ -186,14 +186,20 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                         .fillColor(0x220000FF)
                         .strokeWidth(3));
 
-                PolylineOptions rectOptions = new PolylineOptions()
-                        .add(new LatLng(43.33062694022334, 21.89498625432127))
-                        .add(new LatLng(43.33062691576371,21.89244233433097))  // North of the previous point, but at the same longitude
-                        .add(new LatLng(43.32766806767339, 21.89268252985606))  // Same latitude, and 30km to the west
-                        .add(new LatLng(43.328144128254515,21.89518780586673))  // Same longitude, and 16km to the south
-                        .add(new LatLng(43.33062694022334, 21.89498625432127)); // Closes the polyline.
+                mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(ar.centerLat,ar.centerLon))
+                        .title(ar.name)).setTag("Arena");
 
-                mMap.addPolyline(rectOptions);
+
+//
+//                PolylineOptions rectOptions = new PolylineOptions()
+//                        .add(new LatLng(43.33062694022334, 21.89498625432127))
+//                        .add(new LatLng(43.33062691576371,21.89244233433097))  // North of the previous point, but at the same longitude
+//                        .add(new LatLng(43.32766806767339, 21.89268252985606))  // Same latitude, and 30km to the west
+//                        .add(new LatLng(43.328144128254515,21.89518780586673))  // Same longitude, and 16km to the south
+//                        .add(new LatLng(43.33062694022334, 21.89498625432127)); // Closes the polyline.
+
+//                mMap.addPolyline(rectOptions);
             }
         }
     }
@@ -219,35 +225,50 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
 */
         final String title = marker.getTitle();
 
-        if(title!=this.username) {
-            ExecutorService transThread = Executors.newSingleThreadExecutor();
-            transThread.submit(new Runnable() {
-                @Override
-                public void run() {
-                    try
-                    {
-                        user = HTTP.getUser(title);
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-
-                }
-            });
-            transThread.shutdown();
-            try {
-                transThread.awaitTermination(Long.MAX_VALUE, java.util.concurrent.TimeUnit.SECONDS);
-                Intent i = new Intent(UsersMapActivity.this, UserPanelActivity.class);
-                i.putExtra("userInfo", user);
-                startActivity(i);
-
-            } catch (InterruptedException E) {
-                // handle
+        if(marker.getTag().equals("Arena"))
+        {
+            Arena are = new Arena();
+            for (Iterator<Arena> a = playingArenas.iterator(); a.hasNext();) {
+                Arena ar = a.next();
+                if(ar.name.equals(title))
+                    are = ar;
             }
 
-        }
+            Intent i = new Intent(UsersMapActivity.this, ArenaActivity.class);
+            i.putExtra("arenaName", are.name);
+            i.putExtra("arenaRadius", are.radius);
+            i.putExtra("centerLat", are.centerLat);
+            i.putExtra("centerLon", are.centerLon);
 
+            startActivity(i);
+        }
+        else
+        {
+            if(title!=this.username) {
+                ExecutorService transThread = Executors.newSingleThreadExecutor();
+                transThread.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            user = HTTP.getUser(title);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                });
+                transThread.shutdown();
+                try {
+                    transThread.awaitTermination(Long.MAX_VALUE, java.util.concurrent.TimeUnit.SECONDS);
+                    Intent i = new Intent(UsersMapActivity.this, UserPanelActivity.class);
+                    i.putExtra("userInfo", user);
+                    startActivity(i);
+
+                } catch (InterruptedException E) {
+                    // handle
+                }
+            }
+        }
         return false;
     }
 
