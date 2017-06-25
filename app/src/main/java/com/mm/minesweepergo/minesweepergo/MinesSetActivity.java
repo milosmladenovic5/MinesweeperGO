@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -36,6 +37,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -172,6 +174,15 @@ public class MinesSetActivity extends AppCompatActivity implements OnMapReadyCal
 
             ;
         };
+
+        mMap.addCircle(new CircleOptions()
+                .center(new LatLng(arena.centerLat, arena.centerLon))
+                .radius(arena.radius)
+                .strokeColor(Color.RED)
+                .fillColor(0x220000FF)
+                .strokeWidth(3));
+
+
     }
 
     @Override

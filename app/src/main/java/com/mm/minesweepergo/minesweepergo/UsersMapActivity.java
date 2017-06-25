@@ -123,7 +123,6 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
 
     @Override
     protected void onStop() {
-        Toast.makeText(this, "Otisao sam na drugu aktivnost.", Toast.LENGTH_LONG).show();
 
         super.onStop();
     }
@@ -380,11 +379,6 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.match:
-                Intent matchIntent = new Intent(this,MinesSetActivity.class);
-                matchIntent.putExtra("Username",username);
-                startActivity(matchIntent);
-                break;
             case R.id.show_friends:
                 loadFriends();
                 for (int i = 0; i < this.users.size(); i++) {
