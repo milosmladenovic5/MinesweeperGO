@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -24,7 +25,7 @@ import java.util.concurrent.Executors;
 
 import static com.mm.minesweepergo.minesweepergo.R.id.aActiveGames;
 
-public class ArenaActivity extends AppCompatActivity {
+public class ArenaActivity extends AppCompatActivity implements View.OnClickListener {
 
     public Arena arena;
     ArrayAdapter<String> adapterGames;
@@ -34,11 +35,32 @@ public class ArenaActivity extends AppCompatActivity {
     ListView games;
 
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.aAddGame:
+                // startuj intent
+                // prosledi mu arenu za koje se pravi novi GEJM
+                Intent i = new Intent(ArenaActivity.this, MinesSetActivity.class);
+                i.putExtra("arena", this.arena);
+
+                try {
+                    startActivity(i);
+                }catch(Exception e) {
+                    Log.e("ha", "ha");
+                }
+
+                break;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_arena);
+
+        Button addGame = (Button) findViewById(R.id.aAddGame);
+        addGame.setOnClickListener(this);
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.arena_toolbar);
         setSupportActionBar(myToolbar);

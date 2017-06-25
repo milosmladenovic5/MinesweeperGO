@@ -817,9 +817,9 @@ public class HTTP {
                 JSONArray jsonArray = new JSONArray(str);
 
                 for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject jsonObjectOrg = new JSONObject(jsonArray.getString(i));
+                    JSONObject jsonObject = new JSONObject(jsonArray.getString(i));
 
-                    JSONObject jsonObject = jsonObjectOrg.getJSONObject("properties");
+                    //JSONObject jsonObject = jsonObjectOrg.getJSONObject("properties");
 
 
                     LatLng location = new LatLng(jsonObject.getDouble("Latitude"), jsonObject.getDouble("Longitude"));
@@ -840,4 +840,54 @@ public class HTTP {
         return mines;
     }
 
+
+    //  nije testirana!
+    public static int createGame(Game game, String arenaName) { // ceo Game objekat u slucaju da joj dodamo jos neki prop. kasnije
+
+        int gameId = -1;
+
+        try {
+            URL url = new URL(Constants.URL + "/api/createGame");
+
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(10000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+
+
+
+            JSONObject body = new JSONObject();
+
+            body.put("creatorUsername", game.getCreatorUsername());
+            body.put("arenaName", arenaName);
+
+            Uri.Builder builder = new Uri.Builder().appendQueryParameter("action", body.toString());
+            String query = builder.build().getEncodedQuery();
+
+
+
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            bw.write(query);
+            bw.flush();
+            bw.close();
+            os.close();
+            int responseCode = conn.getResponseCode();
+
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                String temp = inputStreamToString(conn.getInputStream());
+                JSONObject pair = new JSONObject(temp);
+                gameId = pair.getInt("gameId"); // ako glupi int ponovo pravi problem, parse string samo
+            }
+
+        } catch (Exception e) {
+            Log.e("http", "error");
+        }
+        return gameId;
+    }
+    //  TODO :
+    public static String addMines(int gameId, List<Mine> mines) {return null;}
 }

@@ -107,7 +107,7 @@
         </receiver>
 
         <activity
-            android:name=".MatchActivity"
+            android:name=".MinesSetActivity"
             android:label="Match"
             android:parentActivityName=".UsersMapActivity"
             android:theme="@style/AppTheme.NoActionBar">

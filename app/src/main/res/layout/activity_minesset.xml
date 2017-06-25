@@ -18,7 +18,19 @@
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
+        <android.support.v7.widget.AppCompatSeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/msSetMine"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Set mine" />
+
     </android.support.design.widget.AppBarLayout>
+
+
 
     <include layout="@layout/content_minesset" />
 

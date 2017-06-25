@@ -28,8 +28,8 @@ public class Mine {
     public boolean isFound() {return this.found;}
     public void flagMine() {this.found = true /* kad jednom stavi zastavicu NE moze da je  dira - sorry */;}
 
-    public int isNearby(Location userLocation, double scannerRadius){ // za sad smo odlucili da bidne fiksan ili da zavisi od poena
-        //  ako je usao u blastRadius i pritisnuo scan - mrtav je
+    public int isNearby(Location userLocation, double scanRadius){ // za sad smo odlucili da bidne fiksan ili da zavisi od poena
+        //  ako je usao u blastRadius i pritisnuo scan - BUUUUUUUUUUUUUUUM
         //  ako je mina u "rasponu (in range - wtf )" skenera(scannerRadius) vraca se true (i inkremenitra broj koji se prikazuje na mapi)
 
         //  razdaljina u metrima
@@ -37,7 +37,7 @@ public class Mine {
 
         if(this.found) return 1; // nista
         else if (distance < this.blastRadius ) return -1; //   mrtav
-        else if(distance < scannerRadius) return 0; //   nasao je
+        else if(distance < scanRadius) return 0; //   nasao je
         else return 1; //   nista
 
     }

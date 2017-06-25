@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -39,19 +40,20 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.mm.minesweepergo.minesweepergo.DomainModel.Arena;
+import com.mm.minesweepergo.minesweepergo.DomainModel.Mine;
 import com.mm.minesweepergo.minesweepergo.DomainModel.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mm.minesweepergo.minesweepergo.R.id.match_map;
+import static com.mm.minesweepergo.minesweepergo.R.id.minesset_map;
 import static com.mm.minesweepergo.minesweepergo.R.id.minesset_map;
 
 public class MinesSetActivity extends AppCompatActivity implements OnMapReadyCallback,GoogleMap.OnMarkerClickListener, GoogleApiClient.OnConnectionFailedListener,LocationListener,GoogleApiClient.ConnectionCallbacks, InputDialogFragment.NoticeDialogListener {
 
     private GoogleMap mMap;
     private SupportMapFragment mapFragment;
-    private List<User> users;
+
     private String username;
     private Context context;
     private Handler guiThread;
@@ -65,7 +67,13 @@ public class MinesSetActivity extends AppCompatActivity implements OnMapReadyCal
     private List<User> onlineUsers;
     public String dialogRetVal;
     private boolean radius;
-    private List<Arena> playingArenas = new ArrayList<>();
+
+ // ne smem ni da pipnem ovo gore ---------------
+    Arena arena;
+    List<Mine> mines;
+    boolean mapIsReady = false;
+    double explosiveLeft;
+
 
 
     @Override
@@ -73,6 +81,10 @@ public class MinesSetActivity extends AppCompatActivity implements OnMapReadyCal
         context = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_minesset);
+
+        // TODO : pribaviti username (iz pref. ili bundle)
+        Intent intent = getIntent();
+        this.arena = (Arena) intent.getParcelableExtra("arena");
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -84,9 +96,19 @@ public class MinesSetActivity extends AppCompatActivity implements OnMapReadyCal
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+//
+//        Intent i = getIntent();
+//        this.username = i.getExtras().getString("Username", "empty");
 
-        Intent i = getIntent();
-        this.username = i.getExtras().getString("Username", "empty");
+        this.explosiveLeft = arena.radius  / 3;
+        Toast.makeText(this, String.valueOf(this.explosiveLeft), Toast.LENGTH_SHORT).show();
+    }
+
+
+    private void setMine(/* - || - */){
+            //  TODO : proveri da li je van arene
+            //  TODO : proveri da li ima dovoljno eksploziva (tj. samo napravi od onoga sto ima..)
+            //  TODO : *gurni novi majn u lokalni gejm objekat
     }
 
     @Override
@@ -136,6 +158,7 @@ public class MinesSetActivity extends AppCompatActivity implements OnMapReadyCal
         mMap.setMyLocationEnabled(true);
         //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.setOnMarkerClickListener(this);
+        this.mapIsReady = true; // ~
 
         mLocationCallback = new LocationCallback() {
             @Override
@@ -222,6 +245,7 @@ public class MinesSetActivity extends AppCompatActivity implements OnMapReadyCal
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        // TODO : neka mu toast napise blastRadius ili nesto..
         return false;
     }
 
