@@ -82,14 +82,12 @@ public class MinesSearchActivity extends AppCompatActivity implements View.OnCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mines_search);
 
-        SharedPreferences sharedPref = this.getSharedPreferences(
-                "UserInfo", Context.MODE_PRIVATE);
-
-        username = sharedPref.getString("Username", "empty");
 
         Intent intent = getIntent();
         this.arena = (Arena) intent.getParcelableExtra("arena");
         this.gameId = intent.getIntExtra("gameId",0);
+
+        String username = intent.getStringExtra("username");
 
         game = new Game();
 
@@ -225,11 +223,11 @@ public class MinesSearchActivity extends AppCompatActivity implements View.OnCli
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_match, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.menu_match, menu);
+//        return super.onCreateOptionsMenu(menu);
+//    }
 
     @Override
     public void onLocationChanged(Location location) {

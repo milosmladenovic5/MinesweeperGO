@@ -79,16 +79,15 @@ public class ArenaActivity extends AppCompatActivity implements View.OnClickList
         games.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String itemText = (String) parent.getItemAtPosition(position);
-                String [] parts = itemText.split("|");
-                String username = parts[1];
-                String gameId = parts[0];
+                String username = allGames.get(position).getCreatorUsername();
+                int gameId = allGames.get(position).getId();
 
                 Toast.makeText(ArenaActivity.this, "Username" + username + "\t game id je " + gameId, Toast.LENGTH_SHORT).show();
 
                 Intent i = new Intent(ArenaActivity.this,MinesSearchActivity.class);
                 i.putExtra("username",username);
-                i.putExtra("gameId",Integer.parseInt(gameId));
+                i.putExtra("gameId",gameId);
+                i.putExtra("arena", arena);
 
                 startActivity(i);
             }

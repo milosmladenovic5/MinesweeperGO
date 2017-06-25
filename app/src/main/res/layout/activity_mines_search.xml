@@ -23,14 +23,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/common_google_signin_btn_text_light_focused"
-            android:text="Set mine" />
+            android:text="Check for mine" />
 
         <Button
             android:id="@+id/msrPutFlag"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/common_google_signin_btn_text_light_focused"
-            android:text="Set mine" />
+            android:text="Put flag" />
 
     </android.support.design.widget.AppBarLayout>
 

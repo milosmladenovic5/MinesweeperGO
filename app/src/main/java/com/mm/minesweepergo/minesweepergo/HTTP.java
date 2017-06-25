@@ -984,16 +984,34 @@ public class HTTP {
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 String str = inputStreamToString(conn.getInputStream());
-                JSONObject jsonObject = new JSONObject(str);
+                JSONArray jsonArray = new JSONArray(str);
+                JSONObject object = (JSONObject) jsonArray.get(0);
 
-                if(jsonObject!=null){
+                if(object!=null){
                     retGame = new Game();
 
-                    retGame.setCreatorUsername(jsonObject.getString("CreatorUsername"));
-                    retGame.setId(gameId);
+                    retGame.setCreatorUsername(object.getString("CreatorUsername"));
 
-                    JSONObject minesObject = jsonObject.getJSONObject("Mines");
-                    //JSONArray mines = minesObject.getJSONArray("")
+                    JSONArray mines = new JSONArray(object.getString("Mines"));
+
+                    for (int i=0; i<mines.length(); i++)
+                    {
+                        Mine mine = new Mine();
+                        JSONObject mn = mines.getJSONObject(i);
+                        mine.setBlastRadius(mn.getDouble("blastRadius"));
+                        mine.setLocation(new LatLng(mn.getDouble("Latitude"),mn.getDouble("Longitude")));
+
+                        retGame.addMine(mine);
+                    }
+
+
+
+
+//                    retGame.setCreatorUsername(jsonArray.get()getString("CreatorUsername"));
+//                    retGame.setId(gameId);
+//
+//                    JSONObject minesObject = jsonArray.getJSONObject("Mines");
+//                    //JSONArray mines = minesObject.getJSONArray("")
 
                 }
             } else
