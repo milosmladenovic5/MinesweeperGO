@@ -880,14 +880,132 @@ public class HTTP {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 String temp = inputStreamToString(conn.getInputStream());
                 JSONObject pair = new JSONObject(temp);
-                gameId = pair.getInt("gameId"); // ako glupi int ponovo pravi problem, parse string samo
+                gameId = Integer.parseInt(pair.getString("gameId"));
             }
 
         } catch (Exception e) {
             Log.e("http", "error");
+            gameId = -1; // za svaki slucaj !
         }
         return gameId;
     }
     //  TODO :
-    public static String addMines(int gameId, List<Mine> mines) {return null;}
+    public static String addMines(int gameId, List<Mine> mines)
+    {
+        String retStr = "Error";
+
+        try {
+            URL url = new URL(Constants.URL + "/api/addMines");
+
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(10000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+
+
+            JSONObject body = new JSONObject();
+            body.put("gameId", gameId);
+
+
+            JSONArray minesJSONrray = new JSONArray();
+
+            for (Iterator<Mine> mineIterator = mines.iterator(); mineIterator.hasNext();)
+            {
+                Mine mine = mineIterator.next();
+                JSONObject jMine = new JSONObject();
+                jMine.put("blastRadius", mine.getBlastRadius());
+                jMine.put("Latitude", mine.getLocation().latitude);
+                jMine.put("Longitude", mine.getLocation().longitude);
+                minesJSONrray.put(jMine);
+
+            }
+
+            body.put("minesArray", minesJSONrray);
+
+
+
+            Uri.Builder builder = new Uri.Builder().appendQueryParameter("action", body.toString());
+            String query = builder.build().getEncodedQuery();
+
+
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            bw.write(query);
+            bw.flush();
+            bw.close();
+            os.close();
+            int responseCode = conn.getResponseCode();
+
+            Log.e("http", String.valueOf(responseCode));
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                retStr = inputStreamToString(conn.getInputStream());
+            }
+
+            Log.e("http", retStr);
+
+        } catch (Exception e) {
+            Log.e("http", "error");
+        }
+        return retStr;
+    }
+
+
+    public static Game getGame(int gameId)
+    {
+        Game retGame = null;
+
+        try {
+            URL url = new URL(Constants.URL + "/api/getGame");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(10000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+
+            JSONObject body = new JSONObject();
+
+            body.put("gameId", gameId);
+
+
+            Uri.Builder builder = new Uri.Builder().appendQueryParameter("action", body.toString());
+            String query = builder.build().getEncodedQuery();
+
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            bw.write(query);
+
+            bw.flush();
+            bw.close();
+            os.close();
+            int responseCode = conn.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                String str = inputStreamToString(conn.getInputStream());
+                JSONObject jsonObject = new JSONObject(str);
+
+                if(jsonObject!=null){
+                    retGame = new Game();
+
+                    retGame.setCreatorUsername(jsonObject.getString("CreatorUsername"));
+                    retGame.setId(gameId);
+
+                    JSONObject minesObject = jsonObject.getJSONObject("Mines");
+                    //JSONArray mines = minesObject.getJSONArray("")
+
+                }
+            } else
+                Log.e("HTTPCOde_Error", String.valueOf(responseCode));
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+
+        return retGame;
+    }
+
 }

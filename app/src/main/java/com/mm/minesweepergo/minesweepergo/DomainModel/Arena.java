@@ -1,7 +1,10 @@
 package com.mm.minesweepergo.minesweepergo.DomainModel;
 
+import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.mm.minesweepergo.minesweepergo.Utilities;
 
 /**
  * Created by Milos on 6/9/2017.
@@ -40,6 +43,12 @@ public class Arena implements Parcelable {
         this.centerLat = in.readDouble();
         this.centerLon = in.readDouble();
         this.radius = in.readDouble();
+    }
+
+    public boolean outsideArena(Location location)
+    {
+        return Utilities.distance(location.getLatitude(),location.getLongitude(),this.centerLat,this.centerLon, false)> this.radius;
+
     }
 
     @Override

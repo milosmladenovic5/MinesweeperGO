@@ -1,9 +1,13 @@
 package com.mm.minesweepergo.minesweepergo.DomainModel;
 
 import android.location.Location;
+import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Created by Milos on 6/10/2017.
@@ -21,7 +25,16 @@ public class Game {
     public void setCreatorUsername(String creatorUsername) {this.creatorUsername = creatorUsername;}
 
     public void addMine(Mine m) {this.mines.add(m);}
+
     public List<Mine> getMines() {return this.mines;}
+
+
+
+    public Game(){
+        mines = new ArrayList<>();
+
+
+    };
 
     public int scan(Location userLocation, double scanRadius){
 

@@ -78,6 +78,7 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
     private Location mLastLocation;
     protected GoogleApiClient mGoogleApiClient;
     LocationRequest mLocationRequest;
+    LocationListener mLocationListner;
     Marker mCurrLocationMarker;
     private Circle mCircle;
     private List<User> onlineUsers;
@@ -462,6 +463,7 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(1000);
         mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setSmallestDisplacement(3);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
@@ -487,25 +489,28 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
             mCurrLocationMarker.remove();
         }
 
+        Toast.makeText(this, "Location changed.", Toast.LENGTH_LONG).show();
+
+
         //Place current location marker
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title("Current Position");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-        mCurrLocationMarker = mMap.addMarker(markerOptions);
+        //mCurrLocationMarker = mMap.addMarker(markerOptions);
 
       /*  CircleOptions addCircle = new CircleOptions().center(latLng).radius(radiusInMeters).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8);
         mCircle = mMap.addCircle(addCircle);*/
 
         //move map camera
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(20));
 
         //stop location updates
-        if (mGoogleApiClient != null) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        }
+//        if (mGoogleApiClient != null) {
+//            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+//        }
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;

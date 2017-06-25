@@ -4,13 +4,9 @@ import android.Manifest;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.ConnectivityManager;
@@ -18,7 +14,6 @@ import android.net.NetworkInfo;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StyleRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -51,57 +46,41 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.mm.minesweepergo.minesweepergo.DomainModel.Arena;
 import com.mm.minesweepergo.minesweepergo.DomainModel.Game;
-import com.mm.minesweepergo.minesweepergo.DomainModel.Mine;
 import com.mm.minesweepergo.minesweepergo.DomainModel.User;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.mm.minesweepergo.minesweepergo.R.id.arena_name;
+import static com.mm.minesweepergo.minesweepergo.R.id.mines_search_map;
 import static com.mm.minesweepergo.minesweepergo.R.id.minesset_map;
 
-public class MinesSetActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleApiClient.OnConnectionFailedListener,LocationListener,GoogleApiClient.ConnectionCallbacks, InputDialogFragment.NoticeDialogListener {
+public class MinesSearchActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleApiClient.OnConnectionFailedListener,LocationListener,GoogleApiClient.ConnectionCallbacks, InputDialogFragment.NoticeDialogListener {
 
     private GoogleMap mMap;
     private SupportMapFragment mapFragment;
 
     private String username;
-    private Context context;
-    private Handler guiThread;
-    ProgressDialog pd;
     private LocationCallback mLocationCallback;
     private Location mLastLocation;
     protected GoogleApiClient mGoogleApiClient;
     LocationRequest mLocationRequest;
     Marker mCurrLocationMarker;
     private Circle mCircle;
-    private List<User> onlineUsers;
     public String dialogRetVal;
     private boolean radius;
-    SeekBar seekBar;
-    BitmapDescriptor iconBitmap;
-    int idGame;
-
- // ne smem ni da pipnem ovo gore ---------------
-    Arena arena;
     boolean mapIsReady = false;
-    int explosiveLeft;
-    int explosiveSelected;
 
+    Arena arena;
     Game game;
+    int gameId;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        context = this;
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_minesset);
-
-        Bitmap mineIcon = BitmapFactory.decodeResource(context.getResources(),
-                R.drawable.icon_minesweeper);
-        iconBitmap = BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(mineIcon, 40, 50, false));
-
+        setContentView(R.layout.activity_mines_search);
 
         SharedPreferences sharedPref = this.getSharedPreferences(
                 "UserInfo", Context.MODE_PRIVATE);
@@ -110,119 +89,61 @@ public class MinesSetActivity extends AppCompatActivity implements View.OnClickL
 
         Intent intent = getIntent();
         this.arena = (Arena) intent.getParcelableExtra("arena");
-        game = new Game();
-        game.setCreatorUsername(username);
+        this.gameId = intent.getIntExtra("gameId",0);
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        game = new Game();
+
+        ExecutorService transThread = Executors.newSingleThreadExecutor();
+        transThread.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    game = HTTP.getGame(gameId);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+        transThread.shutdown();
+        try {
+            transThread.awaitTermination(Long.MAX_VALUE, java.util.concurrent.TimeUnit.SECONDS);
+
+        } catch (InterruptedException E) {
+            // handle
+        }
+
+
+        game.setCreatorUsername(username);
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(minesset_map);
+                .findFragmentById(mines_search_map);
         mapFragment.getMapAsync(this);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.minesset_map_toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.mines_search_map_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        Button setMine = (Button) findViewById(R.id.msSetMine);
-        setMine.setOnClickListener(this);
+        Button putFlag = (Button) findViewById(R.id.msrPutFlag);
+        Button checkMine = (Button) findViewById(R.id.msrCheckMine);
 
-        this.explosiveLeft = (int)(arena.radius  / 3);
+        putFlag.setOnClickListener(this);
+        checkMine.setOnClickListener(this);
 
-        seekBar = (SeekBar) findViewById(R.id.msSeekBar);
-
-        seekBar.setMax((int)this.explosiveLeft);
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                explosiveSelected = progress;
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-//
-//        Intent i = getIntent();
-//        this.username = i.getExtras().getString("Username", "empty");
     }
 
-    private void setMine(/* - || - */){
-            //  TODO : proveri da li je van arene
-            //  TODO : proveri da li ima dovoljno eksploziva (tj. samo napravi od onoga sto ima..)
-            //  TODO : *gurni novi majn u lokalni gejm objekat
-        if(explosiveSelected==0)
+    @Override
+    public void onClick(View v) {
+        switch (v.getId())
         {
-            Toast.makeText(this,"You can't select 0 explosive.", Toast.LENGTH_SHORT).show();
-            return;
+            case R.id.msrPutFlag:
+                Toast.makeText(this,"Put flag here.", Toast.LENGTH_SHORT).show();
+
+            case R.id.msrCheckMine:
+                Toast.makeText(this, "Check mine here.", Toast.LENGTH_SHORT).show();
+
         }
 
-        if(arena.outsideArena(mLastLocation))
-        {
-            Toast.makeText(this,"Outside of arena.", Toast.LENGTH_SHORT).show();
-        }
-        else{
-            if(explosiveLeft <= explosiveSelected) {
-                 explosiveSelected = explosiveLeft;
-            }
-
-            Mine mine = new Mine();
-            mine.setBlastRadius(explosiveSelected);
-            mine.setLocation(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
-
-            game.addMine(mine);
-
-            mMap.addCircle(new CircleOptions()
-                    .center(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()))
-                    .radius(explosiveSelected)
-                    .strokeColor(Color.CYAN)
-                    .fillColor(0xD63123)
-                    .strokeWidth(3));
-
-            mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()))
-                    .title(username)
-                    .icon(iconBitmap));
-
-            explosiveLeft -= explosiveSelected;
-            //seekBar.setMax(explosiveLeft);
-
-            if(explosiveLeft <= 0)
-            {
-                ExecutorService transThread = Executors.newSingleThreadExecutor();
-                transThread.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            int gameId = HTTP.createGame(game,arena.name);
-                            idGame = gameId;
-                            if(gameId != -1) {
-                                HTTP.addMines(gameId, game.getMines());
-
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-                });
-                transThread.shutdown();
-                try {
-                    transThread.awaitTermination(Long.MAX_VALUE, java.util.concurrent.TimeUnit.SECONDS);
-
-                } catch (InterruptedException E) {
-                    // handle
-                }
-                Toast.makeText(this,"Game id : " + idGame, Toast.LENGTH_SHORT).show();
-                finish();
-
-            }
-        }
     }
 
     @Override
@@ -235,19 +156,6 @@ public class MinesSetActivity extends AppCompatActivity implements View.OnClickL
 
     }
 
-    @Override
-    protected void onApplyThemeResource(Resources.Theme theme, @StyleRes int resid, boolean first) {
-        super.onApplyThemeResource(theme, resid, first);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch(v.getId())
-        {
-            case R.id.msSetMine:
-                setMine();
-        }
-    }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
@@ -336,7 +244,7 @@ public class MinesSetActivity extends AppCompatActivity implements View.OnClickL
         markerOptions.position(latLng);
         markerOptions.title("Current Position");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-     //   mCurrLocationMarker = mMap.addMarker(markerOptions);
+        //   mCurrLocationMarker = mMap.addMarker(markerOptions);
 
 
       /*  CircleOptions addCircle = new CircleOptions().center(latLng).radius(radiusInMeters).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8);

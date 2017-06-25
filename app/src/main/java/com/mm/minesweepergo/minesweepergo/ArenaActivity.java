@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mm.minesweepergo.minesweepergo.DomainModel.Arena;
 import com.mm.minesweepergo.minesweepergo.DomainModel.Game;
@@ -77,11 +78,22 @@ public class ArenaActivity extends AppCompatActivity implements View.OnClickList
 
         games.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String itemText = (String) parent.getItemAtPosition(position);
+                String [] parts = itemText.split("|");
+                String username = parts[1];
+                String gameId = parts[0];
 
-               return;
+                Toast.makeText(ArenaActivity.this, "Username" + username + "\t game id je " + gameId, Toast.LENGTH_SHORT).show();
+
+                Intent i = new Intent(ArenaActivity.this,MinesSearchActivity.class);
+                i.putExtra("username",username);
+                i.putExtra("gameId",Integer.parseInt(gameId));
+
+                startActivity(i);
             }
         });
+
 
         arena = new Arena();
 
@@ -113,7 +125,7 @@ public class ArenaActivity extends AppCompatActivity implements View.OnClickList
 
         for(int j=0; j<allGames.size(); j++)
         {
-            gamesList.add(allGames.get(j).getId() + "\t\t" + allGames.get(j).getCreatorUsername());
+            gamesList.add(allGames.get(j).getId() + "|" + allGames.get(j).getCreatorUsername());
         }
         adapterGames.notifyDataSetChanged();
 

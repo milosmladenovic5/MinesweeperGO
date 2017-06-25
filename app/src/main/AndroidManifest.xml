@@ -114,7 +114,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.mm.minesweepergo.minesweepergo.ArenaActivity" />
-            >
         </activity>
 
         <activity
@@ -127,6 +126,14 @@
                 android:value="com.mm.minesweepergo.minesweepergo.UsersMapActivity" />
         </activity>
 
+        <activity android:name=".MinesSearchActivity"
+            android:label="Game"
+            android:parentActivityName=".ArenaActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.mm.minesweepergo.minesweepergo.ArenaActivity" />
+        </activity>
     </application>
 
 </manifest>
