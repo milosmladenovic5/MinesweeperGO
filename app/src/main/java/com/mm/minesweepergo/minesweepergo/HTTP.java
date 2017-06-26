@@ -889,7 +889,7 @@ public class HTTP {
         }
         return gameId;
     }
-    //  TODO :
+
     public static String addMines(int gameId, List<Mine> mines)
     {
         String retStr = "Error";
@@ -991,6 +991,7 @@ public class HTTP {
                     retGame = new Game();
 
                     retGame.setCreatorUsername(object.getString("CreatorUsername"));
+                    retGame.setId(Integer.parseInt(object.getString("GameId")));
 
                     JSONArray mines = new JSONArray(object.getString("Mines"));
 
@@ -1025,5 +1026,103 @@ public class HTTP {
 
         return retGame;
     }
+
+    public static String deleteGameAndUpdateScore(int gameId, String winner, String loser, float winnerAward, float loserPenalty) { // ceo Game objekat u slucaju da joj dodamo jos neki prop. kasnije
+
+        String retStr= "Error";
+
+        try {
+            URL url = new URL(Constants.URL + "/api/deleteGameAndUpdateScore");
+
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(10000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+
+
+
+            JSONObject body = new JSONObject();
+
+            body.put("gameId", gameId);
+            body.put("winner", winner);
+            body.put("loser", loser);
+            body.put("pointsWon", winnerAward);
+            body.put("penaltyPoints", loserPenalty);
+
+            Uri.Builder builder = new Uri.Builder().appendQueryParameter("action", body.toString());
+            String query = builder.build().getEncodedQuery();
+
+
+
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            bw.write(query);
+            bw.flush();
+            bw.close();
+            os.close();
+            int responseCode = conn.getResponseCode();
+
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                retStr = inputStreamToString(conn.getInputStream());
+
+            }
+
+        } catch (Exception e) {
+            Log.e("http", "error");
+
+        }
+        return retStr;
+    }
+
+
+    public static ArrayList<String> getScoreboard() {
+        ArrayList<String> scores = new ArrayList<String>();
+        try {
+            URL url = new URL(Constants.URL + "/api/getScoreboard");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(10000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+
+//            Uri.Builder builder = new Uri.Builder().appendQueryParameter("action", "yes");
+//            String query = builder.build().getEncodedQuery();
+
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            //bw.write(query);
+
+            bw.flush();
+            bw.close();
+            os.close();
+            int responseCode = conn.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                String str = inputStreamToString(conn.getInputStream());
+                JSONArray jsonArray = new JSONArray(str);
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject obj  = jsonArray.getJSONObject(i);
+
+                    String username =  obj.getString("Username");
+                    double points  = obj.getDouble("Points");
+
+                    scores.add(username + "\t\t\t\t" + points);
+                }
+            } else
+                Log.e("HTTPCOde_Error", String.valueOf(responseCode));
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        return scores;
+    }
+
 
 }

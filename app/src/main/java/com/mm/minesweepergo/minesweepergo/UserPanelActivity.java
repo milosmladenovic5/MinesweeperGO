@@ -209,6 +209,10 @@ public class UserPanelActivity extends AppCompatActivity implements View.OnClick
                 inte.putExtra("Username",this.visitingUser.username);
                 startActivity(inte);
                 break;
+            case R.id.item_scoreboard:
+                Intent inten = new Intent(this, ScoreboardActivity.class);
+                startActivity(inten);
+                break;
             case R.id.item_start_service:
                 Intent intent = new Intent(UserPanelActivity.this, MinesweeperService.class);
                 intent.putExtra("Username", homeUser.username);

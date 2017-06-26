@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.ConnectivityManager;
@@ -48,6 +50,7 @@ import com.mm.minesweepergo.minesweepergo.DomainModel.Arena;
 import com.mm.minesweepergo.minesweepergo.DomainModel.Game;
 import com.mm.minesweepergo.minesweepergo.DomainModel.User;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -59,6 +62,7 @@ public class MinesSearchActivity extends AppCompatActivity implements View.OnCli
 
     private GoogleMap mMap;
     private SupportMapFragment mapFragment;
+    Context context;
 
     private String username;
     private LocationCallback mLocationCallback;
@@ -68,35 +72,81 @@ public class MinesSearchActivity extends AppCompatActivity implements View.OnCli
     Marker mCurrLocationMarker;
     private Circle mCircle;
     public String dialogRetVal;
-    private boolean radius;
     boolean mapIsReady = false;
 
+
+    private boolean radius;
     Arena arena;
     Game game;
     int gameId;
+    int searchRadius;
+    BitmapDescriptor flagBitmap;
+    ArrayList<BitmapDescriptor> numbersBitmaps;
+    BitmapDescriptor mineBitmap;
 
+    int flagCount;
+    CircleOptions circleOptions;
+    Circle circle;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        context = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mines_search);
+
+        numbersBitmaps = new ArrayList<>();
+
+
+        ExecutorService transThread1 = Executors.newSingleThreadExecutor();
+        transThread1.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Bitmap flagIcon = BitmapFactory.decodeResource(context.getResources(),
+                            R.drawable.red_flag);
+                    flagBitmap = BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(flagIcon, 40, 50, false));
+
+                    Bitmap minebmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.icon_minesweeper);
+                    mineBitmap  = BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(minebmp,40,50,false));
+
+                    Bitmap numberOne = BitmapFactory.decodeResource(context.getResources(), R.drawable.number_one);
+                    numbersBitmaps.add(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(numberOne,40,50,false)));
+
+                    Bitmap numberTwo = BitmapFactory.decodeResource(context.getResources(), R.drawable.number_two);
+                    numbersBitmaps.add(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(numberTwo,40,50,false)));
+
+                    Bitmap numberThree = BitmapFactory.decodeResource(context.getResources(), R.drawable.number_three);
+                    numbersBitmaps.add(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(numberThree,40,50,false)));
+
+                    Bitmap numberFour = BitmapFactory.decodeResource(context.getResources(), R.drawable.number_four);
+                    numbersBitmaps.add(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(numberFour,40,50,false)));
+
+                    Bitmap numberFive = BitmapFactory.decodeResource(context.getResources(), R.drawable.number_five);
+                    numbersBitmaps.add(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(numberFive,40,50,false)));
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
 
 
         Intent intent = getIntent();
         this.arena = (Arena) intent.getParcelableExtra("arena");
         this.gameId = intent.getIntExtra("gameId",0);
 
-        String username = intent.getStringExtra("username");
+        username = intent.getStringExtra("username");
 
         game = new Game();
-
         ExecutorService transThread = Executors.newSingleThreadExecutor();
         transThread.submit(new Runnable() {
             @Override
             public void run() {
                 try {
                     game = HTTP.getGame(gameId);
+                    flagCount = game.getMines().size();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -111,6 +161,8 @@ public class MinesSearchActivity extends AppCompatActivity implements View.OnCli
             // handle
         }
 
+
+        searchRadius = (int) arena.radius /6;
 
         game.setCreatorUsername(username);
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -135,14 +187,94 @@ public class MinesSearchActivity extends AppCompatActivity implements View.OnCli
         switch (v.getId())
         {
             case R.id.msrPutFlag:
-                Toast.makeText(this,"Put flag here.", Toast.LENGTH_SHORT).show();
+
+
+                boolean ret = game.flag(mLastLocation);
+                this.flagCount--;
+
+                if(ret)
+                {
+                    endGame(this.gameId, username, game.getCreatorUsername(), flagCount + game.getFlagedCount(), 0 );
+                    Toast.makeText(this, "Congratulations! You win!", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+
+
+
+                mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()))
+                        .title(username)
+                        .icon(flagBitmap));
+
+                break;
 
             case R.id.msrCheckMine:
-                Toast.makeText(this, "Check mine here.", Toast.LENGTH_SHORT).show();
+                int retCode = game.scan(mLastLocation, searchRadius+2);
 
+                if(retCode==-1) {
+                    Button checkMine = (Button) findViewById(R.id.msrCheckMine);
+                    checkMine.setEnabled(false);
+
+                    Button setFlag = (Button) findViewById(R.id.msrPutFlag);
+                    setFlag.setEnabled(false);
+
+                    for (int i = 0; i < game.getMines().size(); i++)
+                    {
+                        mMap.addMarker(new MarkerOptions()
+                                .position(game.getMines().get(i).getLocation())
+                                .title(username)
+                                .icon(mineBitmap));
+                    }
+
+                    endGame(game.getId(),game.getCreatorUsername(),username, game.score(), game.score());
+                    Toast.makeText(this, "Your journey ends!", Toast.LENGTH_LONG).show();
+
+                }
+                else if(retCode!=0)
+                {
+                    if(retCode>5)
+                        retCode = 5;
+
+                    mMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()))
+                            .title(username)
+                            .icon(numbersBitmaps.get(retCode-1)));
+
+                }
+
+
+
+                break;
+        }
+
+        return;
+    }
+
+    public void endGame(final int gameId, final String winner, final String loser, final float winnerAward,  final float loserPenalty)
+    {
+
+        ExecutorService transThread = Executors.newSingleThreadExecutor();
+        transThread.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    HTTP.deleteGameAndUpdateScore(gameId,winner,loser,winnerAward,loserPenalty);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+        transThread.shutdown();
+        try {
+            transThread.awaitTermination(Long.MAX_VALUE, java.util.concurrent.TimeUnit.SECONDS);
+
+        } catch (InterruptedException E) {
+            // handle
         }
 
     }
+
 
     @Override
     public void onDialogNegativeClick(DialogFragment dialog) {
@@ -173,7 +305,6 @@ public class MinesSearchActivity extends AppCompatActivity implements View.OnCli
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
@@ -181,11 +312,11 @@ public class MinesSearchActivity extends AppCompatActivity implements View.OnCli
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
                             Manifest.permission.ACCESS_FINE_LOCATION}, 1);
 
+
             return;
         }
         buildGoogleApiClient();
         mMap.setMyLocationEnabled(true);
-        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.setOnMarkerClickListener(this);
         this.mapIsReady = true; // ~
 
@@ -209,7 +340,6 @@ public class MinesSearchActivity extends AppCompatActivity implements View.OnCli
                 .fillColor(0x220000FF)
                 .strokeWidth(3));
 
-
     }
 
     @Override
@@ -232,9 +362,11 @@ public class MinesSearchActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onLocationChanged(Location location) {
         mLastLocation = location;
-        if (mCurrLocationMarker != null) {
-            mCurrLocationMarker.remove();
+        if (circle!=null) {
+            circle.remove();
         }
+
+
 
         //Place current location marker
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -245,12 +377,22 @@ public class MinesSearchActivity extends AppCompatActivity implements View.OnCli
         //   mCurrLocationMarker = mMap.addMarker(markerOptions);
 
 
+
+        CircleOptions options = new CircleOptions()
+                .center(latLng)
+                .radius(this.searchRadius)
+                .strokeColor(Color.BLACK)
+                .fillColor(0x3300aaff)
+                .strokeWidth(3);
+
+        circle = mMap.addCircle(options);
+
       /*  CircleOptions addCircle = new CircleOptions().center(latLng).radius(radiusInMeters).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8);
         mCircle = mMap.addCircle(addCircle);*/
 
         //move map camera
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(25));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(19));
 
         //stop location updates
 //        if (mGoogleApiClient != null) {
@@ -264,7 +406,7 @@ public class MinesSearchActivity extends AppCompatActivity implements View.OnCli
         mLocationRequest.setInterval(1000);
         mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setSmallestDisplacement(3);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {

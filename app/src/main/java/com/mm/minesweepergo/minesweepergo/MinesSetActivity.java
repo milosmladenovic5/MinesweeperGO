@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -84,6 +85,9 @@ public class MinesSetActivity extends AppCompatActivity implements View.OnClickL
     BitmapDescriptor iconBitmap;
     int idGame;
 
+    TextView selected;
+    TextView remaining;
+
  // ne smem ni da pipnem ovo gore ---------------
     Arena arena;
     boolean mapIsReady = false;
@@ -95,6 +99,7 @@ public class MinesSetActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         context = this;
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_minesset);
 
@@ -102,6 +107,9 @@ public class MinesSetActivity extends AppCompatActivity implements View.OnClickL
                 R.drawable.icon_minesweeper);
         iconBitmap = BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(mineIcon, 40, 50, false));
 
+
+        this.remaining = (TextView) findViewById(R.id.msRemaining);
+        this.selected = (TextView) findViewById(R.id.msSelected);
 
         SharedPreferences sharedPref = this.getSharedPreferences(
                 "UserInfo", Context.MODE_PRIVATE);
@@ -130,11 +138,16 @@ public class MinesSetActivity extends AppCompatActivity implements View.OnClickL
 
         seekBar = (SeekBar) findViewById(R.id.msSeekBar);
 
-        seekBar.setMax((int)this.explosiveLeft);
+        seekBar.setMax((int)this.explosiveLeft/2);
+        this.selected.setText("0/" + String.valueOf(this.explosiveLeft/2 + " blast radius."));
+        this.remaining.setText("Explosive left: " + String.valueOf(explosiveLeft));
+
+
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 explosiveSelected = progress;
+                selected.setText(progress + "/" +explosiveLeft/2 + " blast radius.");
             }
 
             @Override
@@ -191,6 +204,7 @@ public class MinesSetActivity extends AppCompatActivity implements View.OnClickL
 
             explosiveLeft -= explosiveSelected;
             //seekBar.setMax(explosiveLeft);
+            this.remaining.setText("Explosive left: " + String.valueOf(explosiveLeft));
 
             if(explosiveLeft <= 0)
             {
@@ -344,7 +358,7 @@ public class MinesSetActivity extends AppCompatActivity implements View.OnClickL
 
         //move map camera
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(25));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(19));
 
         //stop location updates
 //        if (mGoogleApiClient != null) {
@@ -358,7 +372,7 @@ public class MinesSetActivity extends AppCompatActivity implements View.OnClickL
         mLocationRequest.setInterval(1000);
         mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setSmallestDisplacement(3);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {

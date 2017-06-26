@@ -19,6 +19,10 @@ public class Game {
     private List<Mine> mines;
     private int flagedCount = 0;
 
+    public int getFlagedCount(){return flagedCount;}
+
+    public int score() {return mines.size() - flagedCount;}
+
     public int getId() {return this.id;}
     public void setId(int id) {this.id = id;}
     public String getCreatorUsername() {return this.creatorUsername;}

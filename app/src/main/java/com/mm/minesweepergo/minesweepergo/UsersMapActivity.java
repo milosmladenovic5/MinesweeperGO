@@ -234,6 +234,12 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                     are = ar;
             }
 
+            if(are.outsideArena(mLastLocation))
+            {
+                Toast.makeText(UsersMapActivity.this, "You must enter arena first!", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+
             Intent i = new Intent(UsersMapActivity.this, ArenaActivity.class);
             i.putExtra("arenaName", are.name);
             i.putExtra("arenaRadius", are.radius);
@@ -464,7 +470,7 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
         mLocationRequest.setInterval(1000);
         mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setSmallestDisplacement(3);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -489,9 +495,6 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
             mCurrLocationMarker.remove();
         }
 
-        Toast.makeText(this, "Location changed.", Toast.LENGTH_LONG).show();
-
-
         //Place current location marker
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions();
@@ -505,7 +508,7 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
 
         //move map camera
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(20));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(19));
 
         //stop location updates
 //        if (mGoogleApiClient != null) {

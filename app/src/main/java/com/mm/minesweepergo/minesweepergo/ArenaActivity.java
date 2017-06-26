@@ -1,8 +1,10 @@
 package com.mm.minesweepergo.minesweepergo;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -35,6 +37,7 @@ public class ArenaActivity extends AppCompatActivity implements View.OnClickList
     List<Game> allGames;
 
     ListView games;
+    String myUsername;
 
 
     @Override
@@ -61,6 +64,11 @@ public class ArenaActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_arena);
 
+        SharedPreferences sharedPref = this.getSharedPreferences(
+                "UserInfo", Context.MODE_PRIVATE);
+
+        myUsername = sharedPref.getString("Username", "empty");
+
         Button addGame = (Button) findViewById(R.id.aAddGame);
         addGame.setOnClickListener(this);
 
@@ -82,10 +90,17 @@ public class ArenaActivity extends AppCompatActivity implements View.OnClickList
                 String username = allGames.get(position).getCreatorUsername();
                 int gameId = allGames.get(position).getId();
 
+                if(myUsername.equals(username))
+                {
+                    Toast.makeText(ArenaActivity.this, "Can only play games created by other users.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+
                 Toast.makeText(ArenaActivity.this, "Username" + username + "\t game id je " + gameId, Toast.LENGTH_SHORT).show();
 
                 Intent i = new Intent(ArenaActivity.this,MinesSearchActivity.class);
-                i.putExtra("username",username);
+                i.putExtra("username",myUsername);
                 i.putExtra("gameId",gameId);
                 i.putExtra("arena", arena);
 
@@ -124,7 +139,7 @@ public class ArenaActivity extends AppCompatActivity implements View.OnClickList
 
         for(int j=0; j<allGames.size(); j++)
         {
-            gamesList.add(allGames.get(j).getId() + "|" + allGames.get(j).getCreatorUsername());
+            gamesList.add(allGames.get(j).getId() + " \t\t\t\t\t\t " + allGames.get(j).getCreatorUsername());
         }
         adapterGames.notifyDataSetChanged();
 

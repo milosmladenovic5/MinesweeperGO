@@ -19,17 +19,25 @@
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
 
-        <TextView
-            android:layout_width="20dp"
-            android:id="@+id/mssliderLabel"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-           ></TextView>
+
 
         <android.support.v7.widget.AppCompatSeekBar
             android:layout_width="match_parent"
             android:id="@+id/msSeekBar"
             android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:id="@+id/msSelected"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:id="@+id/msRemaining" />
 
         <Button
             android:id="@+id/msSetMine"
