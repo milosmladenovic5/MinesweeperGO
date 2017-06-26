@@ -44,15 +44,13 @@ public class ArenaActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.aAddGame:
-                // startuj intent
-                // prosledi mu arenu za koje se pravi novi GEJM
                 Intent i = new Intent(ArenaActivity.this, MinesSetActivity.class);
                 i.putExtra("arena", this.arena);
 
                 try {
                     startActivity(i);
                 }catch(Exception e) {
-                    Log.e("ha", "ha");
+                    e.printStackTrace();
                 }
 
                 break;
@@ -95,9 +93,6 @@ public class ArenaActivity extends AppCompatActivity implements View.OnClickList
                     Toast.makeText(ArenaActivity.this, "Can only play games created by other users.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
-
-                Toast.makeText(ArenaActivity.this, "Username" + username + "\t game id je " + gameId, Toast.LENGTH_SHORT).show();
 
                 Intent i = new Intent(ArenaActivity.this,MinesSearchActivity.class);
                 i.putExtra("username",myUsername);

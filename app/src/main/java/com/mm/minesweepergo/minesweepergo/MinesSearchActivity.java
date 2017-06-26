@@ -14,6 +14,7 @@ import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -107,7 +108,7 @@ public class MinesSearchActivity extends AppCompatActivity implements View.OnCli
                             R.drawable.red_flag);
                     flagBitmap = BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(flagIcon, 40, 50, false));
 
-                    Bitmap minebmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.icon_minesweeper);
+                    Bitmap minebmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.icon_color);
                     mineBitmap  = BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(minebmp,40,50,false));
 
                     Bitmap numberOne = BitmapFactory.decodeResource(context.getResources(), R.drawable.number_one);
@@ -188,6 +189,24 @@ public class MinesSearchActivity extends AppCompatActivity implements View.OnCli
         {
             case R.id.msrPutFlag:
 
+                if(flagCount==0)
+                {
+                    //treba da se zavrsi igra
+                    endGame(game.getId(),game.getCreatorUsername(),username, game.score(), game.score());
+                    Toast.makeText(this, "Your journey ends!", Toast.LENGTH_LONG).show();
+
+                    int permissionCheck = 0;
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.VIBRATE},
+                            permissionCheck);
+
+                    Vibrator vi = (Vibrator) this.context.getSystemService(Context.VIBRATOR_SERVICE);
+                    // Vibrate for 500 milliseconds
+                    vi.vibrate(500);
+
+                    finish();
+                }
+
 
                 boolean ret = game.flag(mLastLocation);
                 this.flagCount--;
@@ -199,12 +218,15 @@ public class MinesSearchActivity extends AppCompatActivity implements View.OnCli
                     finish();
                 }
 
-
-
                 mMap.addMarker(new MarkerOptions()
                         .position(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()))
                         .title(username)
                         .icon(flagBitmap));
+
+                mMap.addCircle(new CircleOptions()
+                        .center(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()))
+                        .radius(this.searchRadius)
+                        .fillColor(0x22FF0000));
 
                 break;
 
@@ -224,14 +246,30 @@ public class MinesSearchActivity extends AppCompatActivity implements View.OnCli
                                 .position(game.getMines().get(i).getLocation())
                                 .title(username)
                                 .icon(mineBitmap));
+
+                        mMap.addCircle(new CircleOptions()
+                                .center(game.getMines().get(i).getLocation())
+                                .radius(game.getMines().get(i).getBlastRadius())
+                                .fillColor(0x22111111));
+
                     }
 
                     endGame(game.getId(),game.getCreatorUsername(),username, game.score(), game.score());
                     Toast.makeText(this, "Your journey ends!", Toast.LENGTH_LONG).show();
 
+                    int permissionCheck = 0;
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.VIBRATE},
+                            permissionCheck);
+
+                    Vibrator vi = (Vibrator) this.context.getSystemService(Context.VIBRATOR_SERVICE);
+                    // Vibrate for 500 milliseconds
+                    vi.vibrate(500);
                 }
                 else if(retCode!=0)
                 {
+                    Toast.makeText(this,"Number of miness found is: \t" + retCode, Toast.LENGTH_SHORT).show();
+
                     if(retCode>5)
                         retCode = 5;
 
@@ -242,13 +280,13 @@ public class MinesSearchActivity extends AppCompatActivity implements View.OnCli
 
                 }
 
-
-
                 break;
         }
 
         return;
     }
+
+
 
     public void endGame(final int gameId, final String winner, final String loser, final float winnerAward,  final float loserPenalty)
     {
