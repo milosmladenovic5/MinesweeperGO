@@ -47,6 +47,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.mm.minesweepergo.minesweepergo.DomainModel.Arena;
+import com.mm.minesweepergo.minesweepergo.DomainModel.Mine;
 import com.mm.minesweepergo.minesweepergo.DomainModel.User;
 
 import java.io.InputStream;
@@ -90,6 +91,9 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
 
     List<Marker> friendsMarkers;
     List<Marker> onlineUsersMarkers;
+    boolean friendsLoaded = false;
+    boolean onlineUsersLoaded = false;
+    Handler periodicCode;
 
 
     double radiusInMeters = 100.0;
@@ -118,6 +122,55 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
 
         Intent i = getIntent();
         this.username = i.getExtras().getString("Username", "empty");
+
+        this.friendsMarkers = new ArrayList<>();
+        this.onlineUsersMarkers = new ArrayList<>();
+
+        this.periodicCode = new Handler();
+        this.periodicCode.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                if(friendsLoaded)
+                {
+                    for (Iterator<Marker> markerIterator = friendsMarkers.iterator(); markerIterator.hasNext();)
+                    {
+                        Marker m = markerIterator.next();
+                        m.remove();
+                    }
+
+                    loadFriends();
+                    for (int i = 0; i < users.size(); i++) {
+                        User u = users.get(i);
+                        LatLng mark = new LatLng(u.latitude, u.longitude);
+                        BitmapDescriptor iconBitmap = BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(u.image, 40, 50, false));
+                        Marker m = mMap.addMarker(new MarkerOptions().position(mark).title(u.username)
+                                .icon(iconBitmap));
+                        m.setTag(56);
+                        friendsMarkers.add(m);
+
+                    }
+                }
+
+                if(onlineUsersLoaded)
+                {
+                    for (Iterator<Marker> markerIterator = onlineUsersMarkers.iterator(); markerIterator.hasNext();)
+                    {
+                        Marker m = markerIterator.next();
+                        m.remove();
+                    }
+
+                    loadOnlineUsers();
+                    for (int i = 0; i < onlineUsers.size(); i++) {
+                        User u = onlineUsers.get(i);
+                        LatLng mark = new LatLng(u.latitude, u.longitude);
+                        Marker m = mMap.addMarker(new MarkerOptions().position(mark).title(u.username));
+                        onlineUsersMarkers.add(m);
+                    }
+                }
+
+            }
+        },10000);
     }
 
     public void showNoticeDialog() {
@@ -404,6 +457,7 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                     this.friendsMarkers.add(m);
 
                 }
+                this.friendsLoaded = true;
                 break;
 
             case R.id.show_online_users_item:
@@ -411,8 +465,10 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                 for (int i = 0; i < this.onlineUsers.size(); i++) {
                     User u = onlineUsers.get(i);
                     LatLng mark = new LatLng(u.latitude, u.longitude);
-                    mMap.addMarker(new MarkerOptions().position(mark).title(u.username));
+                    Marker m = mMap.addMarker(new MarkerOptions().position(mark).title(u.username));
+                    this.onlineUsersMarkers.add(m);
                 }
+                this.onlineUsersLoaded = true;
                 break;
 
             case R.id.select_loc_cancel_item:
