@@ -415,12 +415,14 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
             case R.id.search_arenas_by_distance:
                 this.radius= true;
                 InputDialogFragment.title="Enter radius (in meters) :";
+                InputDialogFragment.numberTextInput = true;
                 showNoticeDialog();
                 break;
 
             case R.id.search_arenas_by_name:
                 this.radius = false;
                 InputDialogFragment.title="Enter arena title:";
+                InputDialogFragment.numberTextInput = false;
                 showNoticeDialog();
                 break;
 

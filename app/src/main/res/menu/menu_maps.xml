@@ -30,9 +30,9 @@
 
     <item
         android:id="@+id/search_arenas_by_distance"
-        android:title="Radius search"
+        android:title="Radius search arenas"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/search_arenas_by_name"
