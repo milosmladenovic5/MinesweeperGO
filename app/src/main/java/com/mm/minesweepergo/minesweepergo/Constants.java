@@ -5,6 +5,6 @@ package com.mm.minesweepergo.minesweepergo;
  */
 
 public  class Constants {
-    static final String URL = "http://192.168.1.5:8000";
-    //static final String URL = "https://minesweepergov2.herokuapp.com"; /*HEROKU*/
+    //static final String URL = "http://192.168.1.5:8000";
+    static final String URL = "https://minesweepergov2.herokuapp.com"; /*HEROKU*/
 }
