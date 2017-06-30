@@ -94,6 +94,7 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
     boolean friendsLoaded = false;
     boolean onlineUsersLoaded = false;
     Handler periodicCode;
+    Runnable callback;
 
 
     double radiusInMeters = 100.0;
@@ -127,7 +128,7 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
         this.onlineUsersMarkers = new ArrayList<>();
 
         this.periodicCode = new Handler();
-        this.periodicCode.postDelayed(new Runnable() {
+        this.callback = new Runnable() {
             @Override
             public void run() {
 
@@ -175,7 +176,9 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                 periodicCode.postDelayed(this, 10000);
 
             }
-        },30000);
+        };
+
+        this.periodicCode.postDelayed(this.callback,30000);
     }
 
     public void showNoticeDialog() {
@@ -445,6 +448,7 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
     protected void onDestroy() {
 
         super.onDestroy();
+        this.periodicCode.removeCallbacks(this.callback);
 
     }
 
