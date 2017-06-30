@@ -133,13 +133,15 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
 
                 if(friendsLoaded)
                 {
+                    loadFriends();
                     for (Iterator<Marker> markerIterator = friendsMarkers.iterator(); markerIterator.hasNext();)
                     {
                         Marker m = markerIterator.next();
                         m.remove();
                     }
+                    friendsMarkers = new ArrayList<Marker>();
 
-                    loadFriends();
+
                     for (int i = 0; i < users.size(); i++) {
                         User u = users.get(i);
                         LatLng mark = new LatLng(u.latitude, u.longitude);
@@ -154,23 +156,26 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
 
                 if(onlineUsersLoaded)
                 {
+                    loadOnlineUsers();
                     for (Iterator<Marker> markerIterator = onlineUsersMarkers.iterator(); markerIterator.hasNext();)
                     {
                         Marker m = markerIterator.next();
                         m.remove();
                     }
+                    onlineUsersMarkers = new ArrayList<Marker>();
 
-                    loadOnlineUsers();
                     for (int i = 0; i < onlineUsers.size(); i++) {
                         User u = onlineUsers.get(i);
                         LatLng mark = new LatLng(u.latitude, u.longitude);
                         Marker m = mMap.addMarker(new MarkerOptions().position(mark).title(u.username));
                         onlineUsersMarkers.add(m);
                     }
+
                 }
+                periodicCode.postDelayed(this, 10000);
 
             }
-        },10000);
+        },30000);
     }
 
     public void showNoticeDialog() {
@@ -440,6 +445,7 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
     protected void onDestroy() {
 
         super.onDestroy();
+
     }
 
     @Override
