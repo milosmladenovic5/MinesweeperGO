@@ -1124,5 +1124,61 @@ public class HTTP {
         return scores;
     }
 
+    public static List<Arena> getArenasByGamesNumber(int minNumberOfGames) {
+        List<Arena> arenas = new ArrayList<Arena>();
+
+        try {
+            URL url = new URL(Constants.URL + "/api/getArenasByGamesNumber");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(10000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+
+            JSONObject body = new JSONObject();
+
+
+            body.put("minNumberOfGames", minNumberOfGames);
+
+            Uri.Builder builder = new Uri.Builder().appendQueryParameter("action", body.toString());
+            String query = builder.build().getEncodedQuery();
+
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            bw.write(query);
+
+            bw.flush();
+            bw.close();
+            os.close();
+            int responseCode = conn.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                String str = inputStreamToString(conn.getInputStream());
+                JSONArray jsonArray = new JSONArray(str);
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObjectOrg = new JSONObject(jsonArray.getString(i));
+
+                    Arena ar = new Arena();
+
+                    ar.name = jsonObjectOrg.getString("Name");
+                    ar.radius = jsonObjectOrg.getDouble("Radius");
+                    ar.centerLat = jsonObjectOrg.getDouble("CenterLatitude");
+                    ar.centerLon = jsonObjectOrg.getDouble("CenterLongitude");
+
+                    arenas.add(ar);
+                }
+            } else
+                Log.e("HTTPCOde_Error", String.valueOf(responseCode));
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        return arenas;
+    }
+
 
 }

@@ -83,9 +83,13 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
     private Circle mCircle;
     private List<User> onlineUsers;
     public String dialogRetVal;
-    private boolean radius;
+    //private boolean radius;
+    private int searchType = 0;
     private List<Arena> playingArenas = new ArrayList<>();
     private User user;
+
+    List<Marker> friendsMarkers;
+    List<Marker> onlineUsersMarkers;
 
 
     double radiusInMeters = 100.0;
@@ -131,7 +135,7 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
     @Override
     public void onDialogPositiveClick(android.app.DialogFragment dialog) {
         ExecutorService transThread = Executors.newSingleThreadExecutor();
-        if(radius) {
+        if(this.searchType == 1) {
             //ovde je imeplementirano trazenje po  radiusu
             this.dialogRetVal= InputDialogFragment.name;
             transThread.submit(new Runnable() {
@@ -146,7 +150,8 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                 }
             });
         }
-        else{
+        else if (this.searchType == 2)
+            {
             //trazenje po imenu arene je ovde implementirano
             this.dialogRetVal= InputDialogFragment.name;
             transThread.submit(new Runnable() {
@@ -154,7 +159,22 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                 public void run() {
                     try {
 
-                       playingArenas.add( HTTP.getArena(dialogRetVal));
+                       playingArenas.add( HTTP.getArena(dialogRetVal)); // ako pukne zbog ovoga negde Jack Barker je kriv
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+        else
+        {
+            this.dialogRetVal= InputDialogFragment.name;
+            transThread.submit(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+
+                        playingArenas = HTTP.getArenasByGamesNumber(Integer.parseInt(dialogRetVal));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -305,21 +325,7 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
         });
     }
 
-    public Bitmap createIcon(Bitmap b, String username) {
-        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-        Bitmap bmp = Bitmap.createBitmap(80, 80, conf);
-        Canvas canvas1 = new Canvas(bmp);
 
-        Paint color = new Paint();
-        color.setTextSize(35);
-        color.setColor(Color.BLACK);
-
-        canvas1.drawBitmap(b, 0, 0, color);
-
-        canvas1.drawText("User Name!", 30, 40, color);
-
-        return bmp;
-    }
 
     public void loadFriends() {
         ExecutorService transThread = Executors.newSingleThreadExecutor();
@@ -392,8 +398,10 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                     User u = users.get(i);
                     LatLng mark = new LatLng(u.latitude, u.longitude);
                     BitmapDescriptor iconBitmap = BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(u.image, 40, 50, false));
-                    mMap.addMarker(new MarkerOptions().position(mark).title(u.username)
-                            .icon(iconBitmap)).setTag(56);
+                    Marker m = mMap.addMarker(new MarkerOptions().position(mark).title(u.username)
+                            .icon(iconBitmap));
+                    m.setTag(56);
+                    this.friendsMarkers.add(m);
 
                 }
                 break;
@@ -413,14 +421,23 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                 break;
 
             case R.id.search_arenas_by_distance:
-                this.radius= true;
+                //this.radius= true;
+                this.searchType = 1;
                 InputDialogFragment.title="Enter radius (in meters) :";
                 showNoticeDialog();
                 break;
 
             case R.id.search_arenas_by_name:
-                this.radius = false;
-                InputDialogFragment.title="Enter arena title:";
+                //this.radius = false;
+                this.searchType = 2;
+                InputDialogFragment.title="Enter arena name:";
+                showNoticeDialog();
+                break;
+
+            case R.id.search_min_games_nr:
+                //this.radius = false;
+                this.searchType = 3;
+                InputDialogFragment.title="Enter min. number of games:";
                 showNoticeDialog();
                 break;
 
