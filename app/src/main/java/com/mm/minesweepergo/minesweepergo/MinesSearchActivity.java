@@ -134,7 +134,7 @@ public class MinesSearchActivity extends AppCompatActivity implements View.OnCli
             public void run() {
                 try {
                     game = HTTP.getGame(gameId);
-                    flagCount = game.getMines().size();
+                    flagCount = game.getMines().size() * 2;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -213,7 +213,7 @@ public class MinesSearchActivity extends AppCompatActivity implements View.OnCli
                 break;
 
             case R.id.msrCheckMine:
-                int retCode = game.scan(mLastLocation, searchRadius+2);
+                int retCode = game.scan(mLastLocation, searchRadius + 2);
 
                 if(retCode==-1) {
                     Button checkMine = (Button) findViewById(R.id.msrCheckMine);

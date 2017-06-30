@@ -70,17 +70,12 @@ public class MinesSetActivity extends AppCompatActivity implements View.OnClickL
 
     private String username;
     private Context context;
-    private Handler guiThread;
-    ProgressDialog pd;
     private LocationCallback mLocationCallback;
     private Location mLastLocation;
     protected GoogleApiClient mGoogleApiClient;
     LocationRequest mLocationRequest;
     Marker mCurrLocationMarker;
-    private Circle mCircle;
-    private List<User> onlineUsers;
-    public String dialogRetVal;
-    private boolean radius;
+
     SeekBar seekBar;
     BitmapDescriptor iconBitmap;
     int idGame;
@@ -160,15 +155,11 @@ public class MinesSetActivity extends AppCompatActivity implements View.OnClickL
 
             }
         });
-//
-//        Intent i = getIntent();
-//        this.username = i.getExtras().getString("Username", "empty");
+
     }
 
     private void setMine(/* - || - */){
-            //  TODO : proveri da li je van arene
-            //  TODO : proveri da li ima dovoljno eksploziva (tj. samo napravi od onoga sto ima..)
-            //  TODO : *gurni novi majn u lokalni gejm objekat
+
         if(explosiveSelected==0)
         {
             Toast.makeText(this,"You can't select 0 explosive.", Toast.LENGTH_SHORT).show();
