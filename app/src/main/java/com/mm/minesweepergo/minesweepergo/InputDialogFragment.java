@@ -6,6 +6,8 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.renderscript.ScriptGroup;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -18,6 +20,7 @@ import android.widget.EditText;
 public class InputDialogFragment extends DialogFragment {
     public static String  name = null;
     public static String title = null;
+    public static boolean numberTextInput = false;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -36,6 +39,12 @@ public class InputDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         EditText input = (EditText)view.findViewById(R.id.arena_name);
+
+                        if(numberTextInput==true)
+                            input.setInputType(InputType.TYPE_CLASS_PHONE);
+                        else
+                            input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
+
                         name = input.getText().toString();
                         mListener.onDialogPositiveClick(InputDialogFragment.this);
                     }
