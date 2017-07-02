@@ -123,14 +123,15 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
 
         Intent i = getIntent();
         this.username = i.getExtras().getString("Username", "empty");
+        friendsMarkers = new ArrayList<>();
+        onlineUsersMarkers = new ArrayList<>();
 
-        this.friendsMarkers = new ArrayList<>();
-        this.onlineUsersMarkers = new ArrayList<>();
 
         this.periodicCode = new Handler();
         this.callback = new Runnable() {
             @Override
             public void run() {
+
 
                 if(friendsLoaded)
                 {
@@ -306,7 +307,8 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
 */
         final String title = marker.getTitle();
 
-        if(marker.getTag().equals("Arena"))
+
+        if(marker.getTag()!=null)
         {
             Arena are = new Arena();
             for (Iterator<Arena> a = playingArenas.iterator(); a.hasNext();) {
@@ -331,7 +333,7 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
         }
         else
         {
-            if(title!=this.username) {
+            if(!title.equals(this.username)) {
                 ExecutorService transThread = Executors.newSingleThreadExecutor();
                 transThread.submit(new Runnable() {
                     @Override
@@ -463,7 +465,6 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                     BitmapDescriptor iconBitmap = BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(u.image, 40, 50, false));
                     Marker m = mMap.addMarker(new MarkerOptions().position(mark).title(u.username)
                             .icon(iconBitmap));
-                    m.setTag(56);
                     this.friendsMarkers.add(m);
 
                 }
@@ -475,7 +476,8 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                 for (int i = 0; i < this.onlineUsers.size(); i++) {
                     User u = onlineUsers.get(i);
                     LatLng mark = new LatLng(u.latitude, u.longitude);
-                    Marker m = mMap.addMarker(new MarkerOptions().position(mark).title(u.username));
+                    Marker m = mMap.addMarker(new MarkerOptions().position(mark).title(u.username)
+                              );
                     this.onlineUsersMarkers.add(m);
                 }
                 this.onlineUsersLoaded = true;
@@ -505,6 +507,10 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                 this.searchType = 3;
                 InputDialogFragment.title="Enter min. number of games:";
                 showNoticeDialog();
+                break;
+            case R.id.item_create_arena:
+                Intent intent = new Intent(this,CreateArenaActivity.class);
+                startActivity(intent);
                 break;
 
             case android.R.id.home:

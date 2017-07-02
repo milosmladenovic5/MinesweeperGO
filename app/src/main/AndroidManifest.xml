@@ -13,8 +13,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.VIBRATE"/>
-
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <use-feature
         android:name="android.hardware.camera"
@@ -135,17 +134,26 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.mm.minesweepergo.minesweepergo.ArenaActivity" />
         </activity>
-
         <activity
             android:name=".ScoreboardActivity"
             android:label="Scoreboard"
+            android:parentActivityName=".UserPanelActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.mm.minesweepergo.minesweepergo.UserPanelActivity" />
+        </activity>
+
+        <activity
+            android:name=".CreateArenaActivity"
+            android:label="Create arena"
             android:parentActivityName=".UsersMapActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.mm.minesweepergo.minesweepergo.UsersMapActivity" />
+                android:value="com.mm.minesweepergo.minesweepergo.UsersMapActivity">
+        </meta-data>
         </activity>
-
 
     </application>
 

@@ -4,12 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.mm.minesweepergo.minesweepergo.UsersMapActivity">
 
-    <!--<item-->
-        <!--android:id="@+id/match"-->
-        <!--android:title="Match"-->
-        <!--android:orderInCategory="100"-->
-        <!--app:showAsAction="ifRoom" />-->
-
     <item
         android:id="@+id/show_friends"
         android:title="Show online friends"
@@ -43,6 +37,12 @@
     <item
         android:id="@+id/search_min_games_nr"
         android:title="Min games search"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/item_create_arena"
+        android:title="Add new arena"
         android:orderInCategory="100"
         app:showAsAction="never" />
 

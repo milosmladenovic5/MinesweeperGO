@@ -1181,4 +1181,57 @@ public class HTTP {
     }
 
 
+    public static String createArena (Arena arena) {
+
+        String retStr = "";
+
+        try {
+            URL url = new URL(Constants.URL + "/api/createArena");
+
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(10000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+            Log.e("http", "por1");
+
+
+            JSONObject body = new JSONObject();
+
+            body.put("name", arena.name);
+            body.put("radius", arena.radius);
+            body.put("latitude", arena.centerLat);
+            body.put("longitude", arena.centerLon);
+
+            Uri.Builder builder = new Uri.Builder().appendQueryParameter("action", body.toString());
+            String query = builder.build().getEncodedQuery();
+
+
+
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            bw.write(query);
+            bw.flush();
+            bw.close();
+            os.close();
+            int responseCode = conn.getResponseCode();
+
+            Log.e("http", String.valueOf(responseCode));
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                retStr = inputStreamToString(conn.getInputStream());
+
+            } else
+                //retStr = String.valueOf("Error: " + responseCode);
+                retStr = "Error";
+
+            Log.e("http", retStr);
+
+        } catch (Exception e) {
+            Log.e("http", "error");
+        }
+        return retStr;
+    }
+
+
 }

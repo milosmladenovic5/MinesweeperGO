@@ -15,5 +15,5 @@
         android:orderInCategory="100" app:showAsAction="collapseActionView" />
     <item android:id="@+id/item_scoreboard" android:title="Scoreboard"
         android:orderInCategory="100" app:showAsAction="collapseActionView" />
-
+  
 </menu>
