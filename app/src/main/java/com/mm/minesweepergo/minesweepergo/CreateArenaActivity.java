@@ -47,11 +47,19 @@ public class CreateArenaActivity extends AppCompatActivity implements View.OnCli
             case R.id.caCreateArena:
 
 
-                this.arena = new Arena();
-                this.arena.name = name.getText().toString();
-                this.arena.radius = Double.parseDouble(radius.getText().toString());
-                this.arena.centerLat = location.getLatitude();
-                this.arena.centerLon = location.getLongitude();
+                try {
+                    this.arena = new Arena();
+                    this.arena.name = name.getText().toString();
+                    this.arena.radius = Double.parseDouble(radius.getText().toString()) + 0.1f;
+                    this.arena.centerLat = location.getLatitude();
+                    this.arena.centerLon = location.getLongitude();
+                }
+                catch(Exception e)
+                {
+                    e.printStackTrace();
+                    Toast.makeText(this, "Invalid input!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 ExecutorService transThread = Executors.newSingleThreadExecutor();
                 transThread.submit(new Runnable() {
