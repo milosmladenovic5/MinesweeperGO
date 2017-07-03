@@ -147,10 +147,18 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                     for (int i = 0; i < users.size(); i++) {
                         User u = users.get(i);
                         LatLng mark = new LatLng(u.latitude, u.longitude);
-                        BitmapDescriptor iconBitmap = BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(u.image, 40, 50, false));
-                        Marker m = mMap.addMarker(new MarkerOptions().position(mark).title(u.username)
-                                .icon(iconBitmap));
-                        m.setTag(56);
+                        Marker m;
+                        if(u.image!=null)
+                        {
+                            BitmapDescriptor iconBitmap = BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(u.image, 40, 50, false));
+                            m = mMap.addMarker(new MarkerOptions().position(mark).title(u.username)
+                                    .icon(iconBitmap));
+                        }
+                        else{
+                            m = mMap.addMarker(new MarkerOptions().position(mark).title(u.username)
+                                    );
+                        }
+
                         friendsMarkers.add(m);
 
                     }
@@ -462,9 +470,16 @@ public class UsersMapActivity extends AppCompatActivity  implements OnMapReadyCa
                 for (int i = 0; i < this.users.size(); i++) {
                     User u = users.get(i);
                     LatLng mark = new LatLng(u.latitude, u.longitude);
-                    BitmapDescriptor iconBitmap = BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(u.image, 40, 50, false));
-                    Marker m = mMap.addMarker(new MarkerOptions().position(mark).title(u.username)
-                            .icon(iconBitmap));
+                    Marker m;
+                    if(u.image!=null) {
+                        BitmapDescriptor iconBitmap = BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(u.image, 40, 50, false));
+                        m= mMap.addMarker(new MarkerOptions().position(mark).title(u.username)
+                                .icon(iconBitmap));
+                    }
+                    else{
+                        m= mMap.addMarker(new MarkerOptions().position(mark).title(u.username)
+                                );
+                    }
                     this.friendsMarkers.add(m);
 
                 }
