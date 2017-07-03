@@ -186,7 +186,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                 Toast.makeText(RegisterActivity.this, "Error!", Toast.LENGTH_SHORT).show();
 
 
-                            finishActivity(1);
 
                         }
                         catch (Exception e)
@@ -195,15 +194,16 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         }
                     }
                 });
-//                transThread.shutdown();
-//                try {
-//                    transThread.awaitTermination(Long.MAX_VALUE, java.util.concurrent.TimeUnit.SECONDS);
-//
-//                } catch (InterruptedException E) {
-//                    // handle
-//                    return;
-//                }
+                transThread.shutdown();
+                try {
+                    transThread.awaitTermination(Long.MAX_VALUE, java.util.concurrent.TimeUnit.SECONDS);
 
+                } catch (InterruptedException E) {
+                    // handle
+                    return;
+                }
+
+                finish();
 
 
 //                Intent i = new Intent(RegisterActivity.this, MainActivity.class);
